@@ -836,7 +836,7 @@ function ManageProductsTab({ customManga, customBoxSets, onDeleteManga, onDelete
 
 // ── Setup Tab ──
 function SetupTab() {
-  const [status, setStatus] = useState<string>('');
+  const [status, setStatus] = useState('');
   const [checking, setChecking] = useState(false);
 
   const checkTables = async () => {

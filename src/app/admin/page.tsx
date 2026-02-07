@@ -831,9 +831,7 @@ function ManageProductsTab({ customManga, customBoxSets, onDeleteManga, onDelete
         </div>
       </section>
     );
-  }
 }
-
 // ── Setup Tab ──
 function SetupTab() {
   const [status, setStatus] = useState('');

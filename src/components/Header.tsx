@@ -114,56 +114,6 @@ export default function Header() {
 
           {/* Search, Cart & Mobile Menu */}
           <div className="flex items-center gap-3">
-            {/* Search Button / Expanding Input */}
-            <div className="relative flex items-center">
-              <AnimatePresence>
-                {isSearchOpen && (
-                  <motion.form
-                    initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: 220, opacity: 1 }}
-                    exit={{ width: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    onSubmit={handleSearchSubmit}
-                    className="overflow-hidden"
-                  >
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search..."
-                      className="w-full px-3 py-1.5 text-sm border border-[var(--mist)] rounded-lg bg-white focus:outline-none focus:border-[var(--crimson)] transition-colors"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') {
-                          setIsSearchOpen(false);
-                          setSearchQuery('');
-                        }
-                      }}
-                      onBlur={() => {
-                        if (!searchQuery) {
-                          setTimeout(() => setIsSearchOpen(false), 200);
-                        }
-                      }}
-                    />
-                  </motion.form>
-                )}
-              </AnimatePresence>
-              <button
-                onClick={() => {
-                  if (isSearchOpen) {
-                    handleSearchSubmit();
-                  } else {
-                    setIsSearchOpen(true);
-                  }
-                }}
-                className="p-2 text-[var(--stone)] hover:text-[var(--ink)] transition-colors"
-                aria-label="Search"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
 
               <Link
                 href="/cart"

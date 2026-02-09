@@ -18,12 +18,11 @@ export default function MangaCard({ manga, index = 0 }: MangaCardProps) {
 
   return (
     <motion.article
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative"
-    >
-      <Link href={`/manga/${manga.id}`} className="block">
+  ...
+  className="group relative"
+>
+  <div className="relative">
+    <Link href={`/manga/${manga.id}`} className="block">
         {/* Image Container */}
         <div className="relative aspect-[2/3] overflow-hidden bg-[var(--mist)]">
           {imgError ? (
@@ -60,20 +59,7 @@ export default function MangaCard({ manga, index = 0 }: MangaCardProps) {
               </span>
             )}
           </div>
-
-{/* Quick Add Button */}
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              whileHover={{ scale: 1.02 }}
-              className="absolute bottom-4 left-4 right-4 py-3 bg-[var(--paper)] text-[var(--ink)] text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                addToCart(manga);
-              }}
-            >
-              Add to Cart
-            </motion.button>
+        </div>
         </div>
 
         {/* Info */}
@@ -97,6 +83,21 @@ export default function MangaCard({ manga, index = 0 }: MangaCardProps) {
           </div>
         </div>
       </Link>
-    </motion.article>
+
+      {/* Quick Add Button OUTSIDE LINK */}
+      <motion.button
+        initial={{ opacity: 0, y: 10 }}
+        whileHover={{ scale: 1.02 }}
+        className="absolute bottom-4 left-4 right-4 py-3 bg-[var(--paper)] text-[var(--ink)] text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          addToCart(manga);
+        }}
+      >
+        Add to Cart
+      </motion.button>
+    </div>
+  </motion.article>
   );
 }

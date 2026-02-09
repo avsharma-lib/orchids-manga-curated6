@@ -7,8 +7,6 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import Header from '@/components/Header';
-import { useProducts } from '@/lib/products-context';
-
 type ResultItem = {
   id: string;
   title: string;

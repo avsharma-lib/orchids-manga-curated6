@@ -18,8 +18,11 @@ export default function MangaCard({ manga, index = 0 }: MangaCardProps) {
 
   return (
     <motion.article
-  ...
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, delay: index * 0.1 }}
   className="group relative"
+>
 >
   <div className="relative">
     <Link href={`/manga/${manga.id}`} className="block">

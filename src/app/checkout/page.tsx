@@ -54,8 +54,12 @@ interface CartItem {
 }
 
 export default function CheckoutPage() {
-  const searchParams = useSearchParams();
-  const isBuyNow = searchParams.get('mode') === 'buynow';
+  const [isBuyNow, setIsBuyNow] = useState(false);
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  setIsBuyNow(params.get('mode') === 'buynow');
+}, []);
   const { items: cartItems, totalPrice: cartTotal, clearCart } = useCart();
   const [buyNowItem, setBuyNowItem] = useState<CartItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

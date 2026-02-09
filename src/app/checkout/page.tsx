@@ -58,7 +58,23 @@ export default function CheckoutPage() {
 
 useEffect(() => {
   const params = new URLSearchParams(window.location.search);
-  setIsBuyNow(params.get('mode') === 'buynow');
+  const mode = params.get('mode');
+
+  if (mode === 'buynow') {
+    setIsBuyNow(true);
+    const stored = sessionStorage.getItem('buy-now-item');
+    if (stored) {
+      try {
+        setBuyNowItem(JSON.parse(stored));
+      } catch {
+        setBuyNowItem(null);
+      }
+    } else {
+      setBuyNowItem(null);
+    }
+  } else {
+    setIsBuyNow(false);
+  }
 }, []);
   const { items: cartItems, totalPrice: cartTotal, clearCart } = useCart();
   const [buyNowItem, setBuyNowItem] = useState<CartItem | null>(null);
@@ -103,7 +119,9 @@ useEffect(() => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const items = isBuyNow && buyNowItem ? [buyNowItem] : cartItems;
+  const items = isBuyNow
+  ? (buyNowItem ? [buyNowItem] : [])
+  : cartItems;
   const totalPrice = isBuyNow && buyNowItem ? buyNowItem.manga.price * buyNowItem.quantity : cartTotal;
   const shippingCost = totalPrice >= 2000 ? 0 : 150;
   const finalTotal = totalPrice + shippingCost;

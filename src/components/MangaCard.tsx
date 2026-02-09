@@ -60,7 +60,6 @@ export default function MangaCard({ manga, index = 0 }: MangaCardProps) {
             )}
           </div>
         </div>
-        </div>
 
         {/* Info */}
         <div className="mt-4 space-y-1">

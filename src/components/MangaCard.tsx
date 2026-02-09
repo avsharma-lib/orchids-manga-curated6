@@ -23,7 +23,6 @@ export default function MangaCard({ manga, index = 0 }: MangaCardProps) {
   transition={{ duration: 0.5, delay: index * 0.1 }}
   className="group relative"
 >
->
   <div className="relative">
     <Link href={`/manga/${manga.id}`} className="block">
         {/* Image Container */}

@@ -3,7 +3,6 @@
 import { useSearchParams } from 'next/navigation';
 import { useProducts } from '@/lib/products-context';
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';

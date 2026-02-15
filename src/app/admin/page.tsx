@@ -3,13 +3,13 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { getAllOrders, updateOrderStatus, Order, addCustomManga, addCustomBoxSet, addCustomActionFigure, addCustomKatana, deleteCustomManga, deleteCustomBoxSet, deleteCustomActionFigure, deleteCustomKatana, CustomMangaRow, CustomBoxSetRow, CustomActionFigureRow, CustomKatanaRow, getCustomManga, getCustomBoxSets, getCustomActionFigures, getCustomKatanas, initCustomProductTables, INIT_SQL, uploadProductImage } from '@/lib/supabase';
+import { getAllOrders, updateOrderStatus, Order, addCustomManga, addCustomBoxSet, addCustomActionFigure, addCustomKatana, deleteCustomManga, deleteCustomBoxSet, deleteCustomActionFigure, deleteCustomKatana, CustomMangaRow, CustomBoxSetRow, CustomActionFigureRow, CustomKatanaRow, getCustomManga, getCustomBoxSets, getCustomActionFigures, getCustomKatanas, initCustomProductTables, INIT_SQL, uploadProductImage, CustomCouponRow, getCoupons, createCoupon, deleteCoupon } from '@/lib/supabase';
 import { formatPrice, genres as staticGenres } from '@/lib/manga-data';
 import { useProducts } from '@/lib/products-context';
 
 const ADMIN_CODES = ['ADMIN AARYAVEER', 'ADMIN SOHAM'];
 
-type AdminTab = 'orders' | 'add-manga' | 'add-boxset' | 'add-figure' | 'add-katana' | 'products' | 'setup';
+type AdminTab = 'orders' | 'add-manga' | 'add-boxset' | 'add-figure' | 'add-katana' | 'products' | 'coupons' | 'setup';
 
 // Image upload component
 function ImageUpload({ value, onChange, label = 'Image', aspect = 'aspect-[2/3]' }: {
@@ -215,6 +215,7 @@ export default function AdminPage() {
               ['add-figure', 'Add Action Figure'],
               ['add-katana', 'Add Katana'],
               ['products', 'Manage Products'],
+              ['coupons', 'Coupons'],
               ['setup', 'DB Setup'],
             ] as [AdminTab, string][]).map(([tab, label]) => (
               <button
@@ -237,6 +238,7 @@ export default function AdminPage() {
       {activeTab === 'add-figure' && <AddActionFigureTab refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
       {activeTab === 'add-katana' && <AddKatanaTab refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
       {activeTab === 'products' && <ManageProductsTab customManga={customMangaList} customBoxSets={customBoxSetList} customFigures={customFigureList} customKatanas={customKatanaList} onDeleteManga={handleDeleteManga} onDeleteBoxSet={handleDeleteBoxSet} onDeleteFigure={handleDeleteFigure} onDeleteKatana={handleDeleteKatana} />}
+      {activeTab === 'coupons' && <CouponsTab />}
       {activeTab === 'setup' && <SetupTab />}
     </div>
   );
@@ -623,6 +625,144 @@ function ManageProductsTab({ customManga, customBoxSets, customFigures, customKa
               <button onClick={() => onDeleteKatana(k.id)} className="px-3 py-2 text-xs border border-red-300 text-red-600 rounded hover:bg-red-50">Delete</button>
             </div>
           ))}</div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ── Coupons Tab ──
+function CouponsTab() {
+  const [coupons, setCoupons] = useState<CustomCouponRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({ code: '', discount: '' });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const loadCoupons = async () => {
+    try {
+      const data = await getCoupons();
+      setCoupons(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCoupons();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    if (!form.code || !form.discount) {
+      setError('Please fill all fields');
+      return;
+    }
+
+    const discount = parseInt(form.discount);
+    if (isNaN(discount) || discount < 1 || discount > 100) {
+      setError('Discount must be between 1 and 100');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await createCoupon(form.code.trim().toUpperCase(), discount);
+      setSuccess('Coupon created successfully!');
+      setForm({ code: '', discount: '' });
+      await loadCoupons();
+    } catch (err: any) {
+      setError(err.message || 'Failed to create coupon');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this coupon?')) return;
+    try {
+      await deleteCoupon(id);
+      await loadCoupons();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete coupon');
+    }
+  };
+
+  if (loading) return <div className="text-center py-12 text-[var(--stone)]">Loading coupons...</div>;
+
+  return (
+    <section className="py-12">
+      <div className="mx-auto max-w-3xl px-6 lg:px-12">
+        <h2 className="text-2xl text-[var(--ink)] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>Manage Coupons</h2>
+
+        {/* Create Coupon Form */}
+        <div className="bg-[var(--paper-warm)] p-6 border border-[var(--mist)] mb-12">
+          <h3 className="text-lg font-medium text-[var(--ink)] mb-4">Create New Coupon</h3>
+          {success && <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 text-sm rounded">{success}</div>}
+          {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 text-sm rounded">{error}</div>}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Coupon Code</label>
+                <input
+                  type="text"
+                  value={form.code}
+                  onChange={e => setForm(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                  placeholder="e.g. SUMMER2024"
+                  className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none uppercase"
+                />
+              </div>
+              <div>
+                <label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Discount Percentage (%)</label>
+                <input
+                  type="number"
+                  value={form.discount}
+                  onChange={e => setForm(prev => ({ ...prev, discount: e.target.value }))}
+                  placeholder="e.g. 10"
+                  min="1"
+                  max="100"
+                  className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full py-3 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50"
+            >
+              {submitting ? 'Creating...' : 'Create Coupon'}
+            </button>
+          </form>
+        </div>
+
+        {/* Existing Coupons List */}
+        <h3 className="text-lg text-[var(--ink)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>Existing Coupons ({coupons.length})</h3>
+        {coupons.length === 0 ? (
+          <p className="text-[var(--stone)] italic">No active coupons found.</p>
+        ) : (
+          <div className="space-y-3">
+            {coupons.map(coupon => (
+              <div key={coupon.id} className="flex items-center justify-between p-4 bg-[var(--paper)] border border-[var(--mist)] rounded hover:border-[var(--ink)] transition-colors">
+                <div>
+                  <p className="font-bold text-[var(--ink)] text-lg tracking-wide">{coupon.code}</p>
+                  <p className="text-sm text-[var(--stone)]">{coupon.discount_percent}% Off</p>
+                </div>
+                <button
+                  onClick={() => handleDelete(coupon.id)}
+                  className="px-4 py-2 text-xs text-red-600 border border-red-200 rounded hover:bg-red-50 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </section>

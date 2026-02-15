@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useCart } from '@/lib/cart-context';
 import { formatPrice } from '@/lib/manga-data';
-import { createOrder, getDeviceId } from '@/lib/supabase';
+import { createOrder, getDeviceId, verifyCoupon } from '@/lib/supabase';
 
 const INDIA_STATES_CITIES: Record<string, string[]> = {
   'Andhra Pradesh': ['Visakhapatnam','Vijayawada','Guntur','Nellore','Kurnool','Rajahmundry','Kakinada','Tirupati','Anantapur','Kadapa','Eluru','Ongole','Srikakulam','Tenali','Proddatur','Chittoor','Hindupur','Machilipatnam','Adoni','Bhimavaram','Madanapalle','Guntakal','Dharmavaram','Gudivada','Narasaraopet','Tadepalligudem','Chilakaluripet','Mangalagiri'],
@@ -82,6 +82,12 @@ useEffect(() => {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
 
+  const [couponCode, setCouponCode] = useState('');
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [verifyingCoupon, setVerifyingCoupon] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -124,7 +130,32 @@ useEffect(() => {
   : cartItems;
   const totalPrice = isBuyNow && buyNowItem ? buyNowItem.manga.price * buyNowItem.quantity : cartTotal;
   const shippingCost = totalPrice >= 2000 ? 0 : 150;
-  const finalTotal = totalPrice + shippingCost;
+
+  const discountAmount = Math.round((totalPrice * discountPercent) / 100);
+  const finalTotal = totalPrice - discountAmount + shippingCost;
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setVerifyingCoupon(true);
+    setCouponError('');
+    setCouponSuccess('');
+
+    try {
+      const { valid, discountPercent, message } = await verifyCoupon(couponCode.trim().toUpperCase());
+      if (valid && discountPercent) {
+        setDiscountPercent(discountPercent);
+        setCouponSuccess(`Coupon applied! ${discountPercent}% off`);
+      } else {
+        setCouponError(message || 'Invalid coupon');
+        setDiscountPercent(0);
+      }
+    } catch (err) {
+      setCouponError('Failed to verify coupon');
+      setDiscountPercent(0);
+    } finally {
+      setVerifyingCoupon(false);
+    }
+  };
 
   const filteredStates = useMemo(() => {
     if (!stateSearch) return ALL_STATES;
@@ -384,7 +415,30 @@ useEffect(() => {
                   ))}
                 </div>
                 <div className="space-y-4 py-6 border-b border-[var(--mist)]">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={e => setCouponCode(e.target.value)}
+                      placeholder="Coupon Code"
+                      className="flex-1 px-4 py-2 text-sm border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none uppercase"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={verifyingCoupon || !couponCode}
+                      className="px-4 py-2 bg-[var(--ink)] text-[var(--paper)] text-xs tracking-wider uppercase disabled:opacity-50"
+                    >
+                      {verifyingCoupon ? '...' : 'Apply'}
+                    </button>
+                  </div>
+                  {couponSuccess && <p className="text-xs text-green-600">{couponSuccess}</p>}
+                  {couponError && <p className="text-xs text-red-600">{couponError}</p>}
+
                   <div className="flex justify-between text-sm"><span className="text-[var(--stone)]">Subtotal</span><span className="text-[var(--ink)]">{formatPrice(totalPrice)}</span></div>
+                  {discountPercent > 0 && (
+                     <div className="flex justify-between text-sm"><span className="text-green-600">Discount ({discountPercent}%)</span><span className="text-green-600">-{formatPrice(discountAmount)}</span></div>
+                  )}
                   <div className="flex justify-between text-sm"><span className="text-[var(--stone)]">Shipping</span><span className="text-[var(--ink)]">{shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</span></div>
                 </div>
                 <div className="flex justify-between py-6">

@@ -174,6 +174,13 @@ export interface CustomKatanaRow {
   created_at?: string;
 }
 
+export interface CustomCouponRow {
+  id: string;
+  code: string;
+  discount_percent: number;
+  created_at?: string;
+}
+
 export async function getCustomManga(): Promise<CustomMangaRow[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
@@ -322,6 +329,77 @@ export async function deleteCustomKatana(id: string) {
   }
 }
 
+// ── Coupons CRUD ──
+
+export async function getCoupons(): Promise<CustomCouponRow[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('custom_coupons')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) {
+    console.error('getCoupons error:', error.message);
+    return [];
+  }
+  return data || [];
+}
+
+export async function createCoupon(code: string, discountPercent: number) {
+  if (!supabase) throw new Error('Supabase not configured');
+
+  // Check if coupon exists
+  const { data: existing } = await supabase
+    .from('custom_coupons')
+    .select('id')
+    .eq('code', code)
+    .maybeSingle();
+
+  if (existing) {
+    throw new Error('Coupon code already exists');
+  }
+
+  const { data, error } = await supabase
+    .from('custom_coupons')
+    .insert([{ code, discount_percent: discountPercent }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('createCoupon error:', error.message);
+    throw error;
+  }
+  return data;
+}
+
+export async function deleteCoupon(id: string) {
+  if (!supabase) return;
+  const { error } = await supabase
+    .from('custom_coupons')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('deleteCoupon error:', error.message);
+    throw error;
+  }
+}
+
+export async function verifyCoupon(code: string): Promise<{ valid: boolean; discountPercent?: number; message?: string }> {
+  if (!supabase) return { valid: false, message: 'System error' };
+
+  const { data, error } = await supabase
+    .from('custom_coupons')
+    .select('*')
+    .eq('code', code)
+    .maybeSingle();
+
+  if (error || !data) {
+    return { valid: false, message: 'Invalid coupon code' };
+  }
+
+  return { valid: true, discountPercent: data.discount_percent };
+}
+
 // Upload image as base64 to product_images table
 export async function uploadProductImage(base64Data: string, contentType: string): Promise<string> {
   if (!supabase) throw new Error('Supabase not configured');
@@ -457,4 +535,16 @@ CREATE POLICY "Allow all access to custom_katanas" ON custom_katanas FOR ALL USI
 
 ALTER TABLE product_images ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all access to product_images" ON product_images FOR ALL USING (true) WITH CHECK (true);
+
+-- Coupons table
+CREATE TABLE IF NOT EXISTS custom_coupons (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  code TEXT NOT NULL UNIQUE,
+  discount_percent INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- RLS for Coupons
+ALTER TABLE custom_coupons ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all access to custom_coupons" ON custom_coupons FOR ALL USING (true) WITH CHECK (true);
 `;

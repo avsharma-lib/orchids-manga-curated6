@@ -7,12 +7,12 @@ import { Manga, formatPrice } from '@/lib/manga-data';
 import { useCart } from '@/lib/cart-context';
 import { useState } from 'react';
 
-interface MangaCardProps {
+interface ClothesCardProps {
   manga: Manga;
   index?: number;
 }
 
-export default function MangaCard({ manga, index = 0 }: MangaCardProps) {
+export default function ClothesCard({ manga, index = 0 }: ClothesCardProps) {
   const { addToCart } = useCart();
   const [imgError, setImgError] = useState(false);
 

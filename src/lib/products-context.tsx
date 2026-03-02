@@ -2,16 +2,16 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import {
-  Manga, BoxSet, ProductInfo,
-  mangaCollection, boxSetsData, mangaProductInfo, genres as staticGenres,
+  Product, TShirt, ProductInfo,
+  productCollection, tShirtsData, clothingProductInfo, genres as staticGenres,
   formatPrice
-} from '@/lib/manga-data';
+} from '@/lib/product-data';
 import {
-  getCustomManga, getCustomBoxSets, getCustomActionFigures, getCustomKatanas,
+  getCustomManga as getCustomProduct, getCustomBoxSets as getCustomTShirts, getCustomActionFigures as getCustomHoodies, getCustomKatanas as getCustomAccessorys,
   CustomMangaRow, CustomBoxSetRow, CustomActionFigureRow, CustomKatanaRow
 } from '@/lib/supabase';
 
-export interface ActionFigure {
+export interface Hoodie {
   id: string;
   title: string;
   description: string;
@@ -27,7 +27,7 @@ export interface ActionFigure {
   dimensions: string;
 }
 
-export interface Katana {
+export interface Accessory {
   id: string;
   title: string;
   description: string;
@@ -43,28 +43,28 @@ export interface Katana {
 }
 
 interface ProductsContextType {
-  allManga: Manga[];
-  allBoxSets: BoxSet[];
-  allActionFigures: ActionFigure[];
-  allKatanas: Katana[];
+  allProduct: Product[];
+  allTShirts: TShirt[];
+  allHoodies: Hoodie[];
+  allAccessories: Accessory[];
   allProductInfo: Record<string, ProductInfo>;
   allGenres: string[];
-  getMangaById: (id: string) => Manga | undefined;
-  getBoxSetById: (id: string) => BoxSet | undefined;
-  getBoxSetsByMangaId: (mangaId: string) => BoxSet[];
+  getProductById: (id: string) => Product | undefined;
+  getTShirtById: (id: string) => TShirt | undefined;
+  getTShirtsByProductId: (productId: string) => TShirt[];
   getProductInfo: (id: string) => ProductInfo;
-  getFeaturedManga: () => Manga[];
-  getNewManga: () => Manga[];
-  getMangaByGenre: (genre: string) => Manga[];
-  getActionFigureById: (id: string) => ActionFigure | undefined;
-  getKatanaById: (id: string) => Katana | undefined;
+  getFeaturedProduct: () => Product[];
+  getNewProduct: () => Product[];
+  getProductByGenre: (genre: string) => Product[];
+  getHoodieById: (id: string) => Hoodie | undefined;
+  getAccessoryById: (id: string) => Accessory | undefined;
   refreshProducts: () => Promise<void>;
   loaded: boolean;
 }
 
 const ProductsContext = createContext<ProductsContextType | undefined>(undefined);
 
-function convertCustomManga(row: CustomMangaRow): Manga {
+function convertCustomProduct(row: CustomMangaRow): Product {
   return {
     id: row.id,
     title: row.title,
@@ -75,30 +75,30 @@ function convertCustomManga(row: CustomMangaRow): Manga {
     image: row.image,
     genre: row.genre || [],
     rating: row.rating,
-    volumes: row.volumes,
+    stock: row.stock,
     status: row.status as 'ongoing' | 'completed',
     featured: row.featured,
     new: row.is_new,
   };
 }
 
-function convertCustomBoxSet(row: CustomBoxSetRow): BoxSet {
+function convertCustomTShirt(row: CustomBoxSetRow): TShirt {
   return {
     id: row.id,
-    mangaId: row.manga_id || '',
+    productId: row.manga_id || '',
     title: row.title,
     description: row.description,
     image: row.image,
     price: row.price,
     originalPrice: row.original_price,
-    volumesIncluded: row.volumes_included,
+    sizesAvailable: row.stock_included,
     publisher: row.publisher,
     weight: row.weight,
     dimensions: row.dimensions,
   };
 }
 
-function convertCustomActionFigure(row: CustomActionFigureRow): ActionFigure {
+function convertCustomHoodie(row: CustomActionFigureRow): Hoodie {
   return {
     id: row.id,
     title: row.title,
@@ -116,7 +116,7 @@ function convertCustomActionFigure(row: CustomActionFigureRow): ActionFigure {
   };
 }
 
-function convertCustomKatana(row: CustomKatanaRow): Katana {
+function convertCustomAccessory(row: CustomKatanaRow): Accessory {
   return {
     id: row.id,
     title: row.title,
@@ -134,30 +134,30 @@ function convertCustomKatana(row: CustomKatanaRow): Katana {
 }
 
 export function ProductsProvider({ children }: { children: ReactNode }) {
-  const [customManga, setCustomManga] = useState<Manga[]>([]);
-  const [customBoxSets, setCustomBoxSets] = useState<BoxSet[]>([]);
-  const [actionFigures, setActionFigures] = useState<ActionFigure[]>([]);
-  const [katanas, setKatanas] = useState<Katana[]>([]);
+  const [customProduct, setCustomProduct] = useState<Product[]>([]);
+  const [customTShirts, setCustomTShirts] = useState<TShirt[]>([]);
+  const [hoodies, setHoodies] = useState<Hoodie[]>([]);
+  const [accessories, setAccessorys] = useState<Accessory[]>([]);
   const [customProductInfo, setCustomProductInfo] = useState<Record<string, ProductInfo>>({});
   const [loaded, setLoaded] = useState(false);
 
   const refreshProducts = useCallback(async () => {
     try {
       const [mangaRows, boxSetRows, figureRows, katanaRows] = await Promise.all([
-        getCustomManga(),
-        getCustomBoxSets(),
-        getCustomActionFigures(),
-        getCustomKatanas(),
+        getCustomProduct(),
+        getCustomTShirts(),
+        getCustomHoodies(),
+        getCustomAccessorys(),
       ]);
 
-      const convertedManga = mangaRows.map(convertCustomManga);
-      setCustomManga(convertedManga);
+      const convertedProduct = mangaRows.map(convertCustomProduct);
+      setCustomProduct(convertedProduct);
 
-      const convertedBoxSets = boxSetRows.map(convertCustomBoxSet);
-      setCustomBoxSets(convertedBoxSets);
+      const convertedTShirts = boxSetRows.map(convertCustomTShirt);
+      setCustomTShirts(convertedTShirts);
 
-      setActionFigures(figureRows.map(convertCustomActionFigure));
-      setKatanas(katanaRows.map(convertCustomKatana));
+      setHoodies(figureRows.map(convertCustomHoodie));
+      setAccessorys(katanaRows.map(convertCustomAccessory));
 
       const info: Record<string, ProductInfo> = {};
       for (const row of mangaRows) {
@@ -165,7 +165,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
           info[row.id] = {
             productType: row.product_info.productType || 'Books',
             publisher: row.product_info.publisher || '-',
-            volumes: row.volumes,
+            stock: row.stock,
             material: row.product_info.material || 'Paper',
             usage: row.product_info.usage || 'Reading',
             isbn: row.product_info.isbn || '-',
@@ -186,22 +186,22 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     refreshProducts();
   }, [refreshProducts]);
 
-  const allManga = [...mangaCollection, ...customManga];
-  const allBoxSets = [...boxSetsData, ...customBoxSets];
-  const allProductInfo = { ...mangaProductInfo, ...customProductInfo };
+  const allProduct = [...productCollection, ...customProduct];
+  const allTShirts = [...tShirtsData, ...customTShirts];
+  const allProductInfo = { ...clothingProductInfo, ...customProductInfo };
   const allGenres = Array.from(
-    new Set([...staticGenres, ...customManga.flatMap(m => m.genre)])
+    new Set([...staticGenres, ...customProduct.flatMap(m => m.genre)])
   ).sort();
 
-  const getMangaByIdFn = (id: string) => allManga.find(m => m.id === id);
-  const getBoxSetByIdFn = (id: string) => allBoxSets.find(b => b.id === id);
-  const getBoxSetsByMangaIdFn = (mangaId: string) => allBoxSets.filter(b => b.mangaId === mangaId);
+  const getProductByIdFn = (id: string) => allProduct.find(m => m.id === id);
+  const getTShirtByIdFn = (id: string) => allTShirts.find(b => b.id === id);
+  const getTShirtsByProductIdFn = (productId: string) => allTShirts.filter(b => b.productId === productId);
   const getProductInfoFn = (id: string): ProductInfo => {
-    const manga = getMangaByIdFn(id);
+    const manga = getProductByIdFn(id);
     return allProductInfo[id] || {
       productType: 'Books',
       publisher: '-',
-      volumes: manga?.volumes || 0,
+      stock: manga?.stock || 0,
       material: 'Paper',
       usage: 'Reading',
       isbn: '-',
@@ -209,30 +209,30 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       dimensions: '-',
     };
   };
-  const getFeaturedMangaFn = () => allManga.filter(m => m.featured);
-  const getNewMangaFn = () => allManga.filter(m => m.new);
-  const getMangaByGenreFn = (genre: string) => allManga.filter(m => m.genre.includes(genre));
-  const getActionFigureByIdFn = (id: string) => actionFigures.find(f => f.id === id);
-  const getKatanaByIdFn = (id: string) => katanas.find(k => k.id === id);
+  const getFeaturedProductFn = () => allProduct.filter(m => m.featured);
+  const getNewProductFn = () => allProduct.filter(m => m.new);
+  const getProductByGenreFn = (genre: string) => allProduct.filter(m => m.genre.includes(genre));
+  const getHoodieByIdFn = (id: string) => hoodies.find(f => f.id === id);
+  const getAccessoryByIdFn = (id: string) => accessories.find(k => k.id === id);
 
   return (
     <ProductsContext.Provider
       value={{
-        allManga,
-        allBoxSets,
-        allActionFigures: actionFigures,
-        allKatanas: katanas,
+        allProduct,
+        allTShirts,
+        allHoodies: hoodies,
+        allAccessories: accessories,
         allProductInfo,
         allGenres,
-        getMangaById: getMangaByIdFn,
-        getBoxSetById: getBoxSetByIdFn,
-        getBoxSetsByMangaId: getBoxSetsByMangaIdFn,
+        getProductById: getProductByIdFn,
+        getTShirtById: getTShirtByIdFn,
+        getTShirtsByProductId: getTShirtsByProductIdFn,
         getProductInfo: getProductInfoFn,
-        getFeaturedManga: getFeaturedMangaFn,
-        getNewManga: getNewMangaFn,
-        getMangaByGenre: getMangaByGenreFn,
-        getActionFigureById: getActionFigureByIdFn,
-        getKatanaById: getKatanaByIdFn,
+        getFeaturedProduct: getFeaturedProductFn,
+        getNewProduct: getNewProductFn,
+        getProductByGenre: getProductByGenreFn,
+        getHoodieById: getHoodieByIdFn,
+        getAccessoryById: getAccessoryByIdFn,
         refreshProducts,
         loaded,
       }}

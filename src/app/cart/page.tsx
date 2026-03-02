@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCart } from '@/lib/cart-context';
-import { formatPrice } from '@/lib/manga-data';
+import { formatPrice } from '@/lib/product-data';
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
@@ -25,7 +25,7 @@ export default function CartPage() {
               Your Cart is Empty
             </h1>
             <p className="text-[var(--stone)] mb-8">
-              Discover our curated collection and add some manga to your cart.
+              Discover our curated collection and add some clothing to your cart.
             </p>
             <Link
               href="/shop"
@@ -72,18 +72,18 @@ export default function CartPage() {
             <div className="lg:col-span-2 space-y-8">
               {items.map((item, index) => (
                 <motion.div
-                  key={item.manga.id}
+                  key={item.product.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className="flex gap-6 pb-8 border-b border-[var(--mist)]"
                 >
                   {/* Image */}
-                  <Link href={`/manga/${item.manga.id}`} className="shrink-0">
+                  <Link href={`/product/${item.product.id}`} className="shrink-0">
                     <div className="relative w-24 h-36 md:w-32 md:h-48 bg-[var(--mist)] overflow-hidden">
                       <Image
-                        src={item.manga.image}
-                        alt={item.manga.title}
+                        src={item.product.image}
+                        alt={item.product.title}
                         fill
                         className="object-cover"
                         sizes="128px"
@@ -95,17 +95,17 @@ export default function CartPage() {
                   <div className="flex-1 flex flex-col">
                     <div className="flex-1">
                       <Link
-                        href={`/manga/${item.manga.id}`}
+                        href={`/product/${item.product.id}`}
                         className="text-lg text-[var(--ink)] hover:text-[var(--crimson)] transition-colors"
                         style={{ fontFamily: 'var(--font-heading)' }}
                       >
-                        {item.manga.title}
+                        {item.product.title}
                       </Link>
                       <p className="text-sm text-[var(--stone)] mt-1">
-                        {item.manga.author}
+                        {item.product.author}
                       </p>
                       <p className="text-sm text-[var(--stone)] mt-2">
-                        {item.manga.genre.slice(0, 2).join(', ')}
+                        {item.product.genre.slice(0, 2).join(', ')}
                       </p>
                     </div>
 
@@ -114,7 +114,7 @@ export default function CartPage() {
                       <div className="flex items-center gap-4">
                         <div className="flex items-center border border-[var(--mist)]">
                           <button
-                            onClick={() => updateQuantity(item.manga.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                             className="w-10 h-10 flex items-center justify-center text-[var(--stone)] hover:text-[var(--ink)] transition-colors"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +125,7 @@ export default function CartPage() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.manga.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                             className="w-10 h-10 flex items-center justify-center text-[var(--stone)] hover:text-[var(--ink)] transition-colors"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +134,7 @@ export default function CartPage() {
                           </button>
                         </div>
                         <button
-                          onClick={() => removeFromCart(item.manga.id)}
+                          onClick={() => removeFromCart(item.product.id)}
                           className="text-sm text-[var(--stone)] hover:text-[var(--crimson)] transition-colors"
                         >
                           Remove
@@ -142,7 +142,7 @@ export default function CartPage() {
                       </div>
 
                       <span className="text-lg font-medium text-[var(--ink)]">
-                        {formatPrice(item.manga.price * item.quantity)}
+                        {formatPrice(item.product.price * item.quantity)}
                       </span>
                     </div>
                   </div>

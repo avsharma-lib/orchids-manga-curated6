@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { getAllOrders, updateOrderStatus, Order, addCustomManga, addCustomBoxSet, addCustomActionFigure, addCustomKatana, deleteCustomManga, deleteCustomBoxSet, deleteCustomActionFigure, deleteCustomKatana, CustomMangaRow, CustomBoxSetRow, CustomActionFigureRow, CustomKatanaRow, getCustomManga, getCustomBoxSets, getCustomActionFigures, getCustomKatanas, initCustomProductTables, INIT_SQL, uploadProductImage, CustomCouponRow, getCoupons, createCoupon, deleteCoupon } from '@/lib/supabase';
-import { formatPrice, genres as staticGenres } from '@/lib/manga-data';
+import { formatPrice, genres as staticGenres } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
 
 const ADMIN_CODES = ['ADMIN AARYAVEER', 'ADMIN SOHAM'];
 
-type AdminTab = 'orders' | 'add-manga' | 'add-boxset' | 'add-figure' | 'add-katana' | 'products' | 'coupons' | 'setup';
+type AdminTab = 'orders' | 'add-product' | 'add-t-shirt' | 'add-hoodie' | 'add-accessory' | 'products' | 'coupons' | 'setup';
 
 // Image upload component
 function ImageUpload({ value, onChange, label = 'Image', aspect = 'aspect-[2/3]' }: {
@@ -77,7 +77,7 @@ function ImageUpload({ value, onChange, label = 'Image', aspect = 'aspect-[2/3]'
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isBrandized, setIsBrandized] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<AdminTab>('orders');
   const { allManga, allBoxSets, refreshProducts } = useProducts();
@@ -90,7 +90,7 @@ export default function AdminPage() {
   useEffect(() => {
     const adminAccess = sessionStorage.getItem('admin-access');
     if (adminAccess && ADMIN_CODES.includes(adminAccess)) {
-      setIsAuthorized(true);
+      setIsBrandized(true);
       loadOrders();
       loadCustomProducts();
     } else {
@@ -135,7 +135,7 @@ export default function AdminPage() {
   };
 
   const handleDeleteManga = async (id: string) => {
-    if (!confirm('Delete this manga?')) return;
+    if (!confirm('Delete this product?')) return;
     try { await deleteCustomManga(id); await refreshProducts(); await loadCustomProducts(); } catch (e) { console.error(e); }
   };
   const handleDeleteBoxSet = async (id: string) => {
@@ -168,7 +168,7 @@ export default function AdminPage() {
     }
   };
 
-  if (!isAuthorized) {
+  if (!isBrandized) {
     return (
       <div className="bg-[var(--paper)] pt-20 min-h-screen">
         <div className="mx-auto max-w-7xl px-6 lg:px-12 py-24">
@@ -210,10 +210,10 @@ export default function AdminPage() {
           <div className="flex gap-0 overflow-x-auto">
             {([
               ['orders', 'Orders'],
-              ['add-manga', 'Add Manga'],
-              ['add-boxset', 'Add Box Set'],
-              ['add-figure', 'Add Action Figure'],
-              ['add-katana', 'Add Katana'],
+              ['add-product', 'Add Product'],
+              ['add-t-shirt', 'Add T-Shirt'],
+              ['add-hoodie', 'Add Action Figure'],
+              ['add-accessory', 'Add Accessory'],
               ['products', 'Manage Products'],
               ['coupons', 'Coupons'],
               ['setup', 'DB Setup'],
@@ -233,10 +233,10 @@ export default function AdminPage() {
       </section>
 
       {activeTab === 'orders' && <OrdersTab orders={orders} expandedOrder={expandedOrder} setExpandedOrder={setExpandedOrder} handleStatusChange={handleStatusChange} formatDate={formatDate} getStatusColor={getStatusColor} />}
-      {activeTab === 'add-manga' && <AddMangaTab allManga={allManga} refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
-      {activeTab === 'add-boxset' && <AddBoxSetTab allManga={allManga} refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
-      {activeTab === 'add-figure' && <AddActionFigureTab refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
-      {activeTab === 'add-katana' && <AddKatanaTab refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
+      {activeTab === 'add-product' && <AddMangaTab allManga={allManga} refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
+      {activeTab === 'add-t-shirt' && <AddBoxSetTab allManga={allManga} refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
+      {activeTab === 'add-hoodie' && <AddActionFigureTab refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
+      {activeTab === 'add-accessory' && <AddKatanaTab refreshProducts={refreshProducts} loadCustomProducts={loadCustomProducts} />}
       {activeTab === 'products' && <ManageProductsTab customManga={customMangaList} customBoxSets={customBoxSetList} customFigures={customFigureList} customKatanas={customKatanaList} onDeleteManga={handleDeleteManga} onDeleteBoxSet={handleDeleteBoxSet} onDeleteFigure={handleDeleteFigure} onDeleteKatana={handleDeleteKatana} />}
       {activeTab === 'coupons' && <CouponsTab />}
       {activeTab === 'setup' && <SetupTab />}
@@ -340,7 +340,7 @@ function OrdersTab({ orders, expandedOrder, setExpandedOrder, handleStatusChange
   );
 }
 
-// ── Add Manga Tab ──
+// ── Add Product Tab ──
 function AddMangaTab({ allManga, refreshProducts, loadCustomProducts }: {
   allManga: any[];
   refreshProducts: () => Promise<void>;
@@ -385,7 +385,7 @@ function AddMangaTab({ allManga, refreshProducts, loadCustomProducts }: {
   return (
     <section className="py-12">
       <div className="mx-auto max-w-3xl px-6 lg:px-12">
-        <h2 className="text-2xl text-[var(--ink)] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>Add New Manga</h2>
+        <h2 className="text-2xl text-[var(--ink)] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>Add New Product</h2>
         {success && <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 text-sm rounded">{success}</div>}
         {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-sm rounded">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -393,7 +393,7 @@ function AddMangaTab({ allManga, refreshProducts, loadCustomProducts }: {
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Title *</label><input type="text" value={form.title} onChange={e => handleTitleChange(e.target.value)} required className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" placeholder="e.g. One Piece" /></div>
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">ID</label><input type="text" value={form.id} onChange={e => setForm(prev => ({ ...prev, id: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper-warm)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
-          <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Author *</label><input type="text" value={form.author} onChange={e => setForm(prev => ({ ...prev, author: e.target.value }))} required className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+          <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Brand *</label><input type="text" value={form.author} onChange={e => setForm(prev => ({ ...prev, author: e.target.value }))} required className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Description</label><textarea value={form.description} onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))} rows={3} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none resize-none" /></div>
           <ImageUpload value={form.image} onChange={url => setForm(prev => ({ ...prev, image: url }))} />
           <div className="grid md:grid-cols-2 gap-4">
@@ -401,21 +401,21 @@ function AddMangaTab({ allManga, refreshProducts, loadCustomProducts }: {
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Original Price</label><input type="number" value={form.originalPrice} onChange={e => setForm(prev => ({ ...prev, originalPrice: e.target.value }))} min="1" className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Volumes</label><input type="number" value={form.volumes} onChange={e => setForm(prev => ({ ...prev, volumes: e.target.value }))} min="1" className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Stock/Sizes</label><input type="number" value={form.volumes} onChange={e => setForm(prev => ({ ...prev, volumes: e.target.value }))} min="1" className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Rating</label><input type="number" value={form.rating} onChange={e => setForm(prev => ({ ...prev, rating: e.target.value }))} step="0.1" min="0" max="5" className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Status</label><select value={form.status} onChange={e => setForm(prev => ({ ...prev, status: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"><option value="completed">Completed</option><option value="ongoing">Ongoing</option></select></div>
           </div>
           <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Genre</label><div className="flex flex-wrap gap-2">{staticGenres.map(genre => (<button key={genre} type="button" onClick={() => toggleGenre(genre)} className={`px-3 py-1.5 text-xs tracking-wider border rounded transition-colors ${form.genre.includes(genre) ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]' : 'border-[var(--mist)] text-[var(--stone)] hover:border-[var(--ink)]'}`}>{genre}</button>))}</div></div>
           <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Section</label><div className="flex flex-wrap gap-3">{[['all','All'],['featured','Featured'],['new','New Arrivals']].map(([val,label]) => (<button key={val} type="button" onClick={() => setForm(prev => ({ ...prev, section: val, featured: val === 'featured', isNew: val === 'new' }))} className={`px-4 py-2 text-sm border rounded ${form.section === val ? 'bg-[var(--ink)] text-[var(--paper)]' : 'border-[var(--mist)] text-[var(--stone)]'}`}>{label}</button>))}</div></div>
           <div className="grid md:grid-cols-2 gap-4"><div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Publisher</label><input type="text" value={form.publisher} onChange={e => setForm(prev => ({ ...prev, publisher: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div><div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">ISBN</label><input type="text" value={form.isbn} onChange={e => setForm(prev => ({ ...prev, isbn: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div></div>
-          <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add Manga'}</button>
+          <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add Product'}</button>
         </form>
       </div>
     </section>
   );
 }
 
-// ── Add Box Set Tab ──
+// ── Add T-Shirt Tab ──
 function AddBoxSetTab({ allManga, refreshProducts, loadCustomProducts }: {
   allManga: any[];
   refreshProducts: () => Promise<void>;
@@ -447,7 +447,7 @@ function AddBoxSetTab({ allManga, refreshProducts, loadCustomProducts }: {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Title *</label><input type="text" value={form.title} onChange={e => { setForm(prev => ({ ...prev, title: e.target.value, id: generateId(e.target.value) })); }} required className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Link to Manga</label><select value={form.mangaId} onChange={e => setForm(prev => ({ ...prev, mangaId: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"><option value="">-- None --</option>{allManga.map(m => (<option key={m.id} value={m.id}>{m.title}</option>))}</select></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Link to Product</label><select value={form.mangaId} onChange={e => setForm(prev => ({ ...prev, mangaId: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"><option value="">-- None --</option>{allManga.map(m => (<option key={m.id} value={m.id}>{m.title}</option>))}</select></div>
           </div>
           <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Description</label><textarea value={form.description} onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))} rows={3} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none resize-none" /></div>
           <ImageUpload value={form.image} onChange={url => setForm(prev => ({ ...prev, image: url }))} aspect="aspect-[4/3]" />
@@ -456,10 +456,10 @@ function AddBoxSetTab({ allManga, refreshProducts, loadCustomProducts }: {
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Original Price</label><input type="number" value={form.originalPrice} onChange={e => setForm(prev => ({ ...prev, originalPrice: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Volumes Included</label><input type="text" value={form.volumesIncluded} onChange={e => setForm(prev => ({ ...prev, volumesIncluded: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Sizes Available</label><input type="text" value={form.volumesIncluded} onChange={e => setForm(prev => ({ ...prev, volumesIncluded: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Publisher</label><input type="text" value={form.publisher} onChange={e => setForm(prev => ({ ...prev, publisher: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
-          <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add Box Set'}</button>
+          <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add T-Shirt'}</button>
         </form>
       </div>
     </section>
@@ -501,7 +501,7 @@ function AddActionFigureTab({ refreshProducts, loadCustomProducts }: { refreshPr
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Brand</label><input type="text" value={form.brand} onChange={e => setForm(prev => ({ ...prev, brand: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" placeholder="e.g. Bandai" /></div>
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Character Name</label><input type="text" value={form.characterName} onChange={e => setForm(prev => ({ ...prev, characterName: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Collection/Style</label><input type="text" value={form.characterName} onChange={e => setForm(prev => ({ ...prev, characterName: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Series</label><input type="text" value={form.series} onChange={e => setForm(prev => ({ ...prev, series: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" placeholder="e.g. Dragon Ball Z" /></div>
@@ -519,7 +519,7 @@ function AddActionFigureTab({ refreshProducts, loadCustomProducts }: { refreshPr
   );
 }
 
-// ── Add Katana Tab ──
+// ── Add Accessory Tab ──
 function AddKatanaTab({ refreshProducts, loadCustomProducts }: { refreshProducts: () => Promise<void>; loadCustomProducts: () => Promise<void>; }) {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
@@ -541,7 +541,7 @@ function AddKatanaTab({ refreshProducts, loadCustomProducts }: { refreshProducts
   return (
     <section className="py-12">
       <div className="mx-auto max-w-3xl px-6 lg:px-12">
-        <h2 className="text-2xl text-[var(--ink)] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>Add Katana</h2>
+        <h2 className="text-2xl text-[var(--ink)] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>Add Accessory</h2>
         {success && <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 text-sm rounded">{success}</div>}
         {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-sm rounded">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -553,16 +553,16 @@ function AddKatanaTab({ refreshProducts, loadCustomProducts }: { refreshProducts
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Original Price</label><input type="number" value={form.originalPrice} onChange={e => setForm(prev => ({ ...prev, originalPrice: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Blade Material</label><input type="text" value={form.bladeMaterial} onChange={e => setForm(prev => ({ ...prev, bladeMaterial: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Handle Material</label><input type="text" value={form.handleMaterial} onChange={e => setForm(prev => ({ ...prev, handleMaterial: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Material</label><input type="text" value={form.bladeMaterial} onChange={e => setForm(prev => ({ ...prev, bladeMaterial: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Secondary Material</label><input type="text" value={form.handleMaterial} onChange={e => setForm(prev => ({ ...prev, handleMaterial: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Blade Length</label><input type="text" value={form.bladeLength} onChange={e => setForm(prev => ({ ...prev, bladeLength: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
-            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Total Length</label><input type="text" value={form.totalLength} onChange={e => setForm(prev => ({ ...prev, totalLength: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Size</label><input type="text" value={form.bladeLength} onChange={e => setForm(prev => ({ ...prev, bladeLength: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Dimensions</label><input type="text" value={form.totalLength} onChange={e => setForm(prev => ({ ...prev, totalLength: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Weight</label><input type="text" value={form.weight} onChange={e => setForm(prev => ({ ...prev, weight: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           </div>
           <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Series / Anime</label><input type="text" value={form.series} onChange={e => setForm(prev => ({ ...prev, series: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" placeholder="e.g. One Piece" /></div>
-          <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add Katana'}</button>
+          <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add Accessory'}</button>
         </form>
       </div>
     </section>
@@ -580,7 +580,7 @@ function ManageProductsTab({ customManga, customBoxSets, customFigures, customKa
         <h2 className="text-2xl text-[var(--ink)] mb-8" style={{ fontFamily: 'var(--font-heading)' }}>Custom Products</h2>
         
         {/* Manga */}
-        <h3 className="text-lg text-[var(--ink)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>Custom Manga ({customManga.length})</h3>
+        <h3 className="text-lg text-[var(--ink)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>Custom Products ({customManga.length})</h3>
         {customManga.length === 0 ? <p className="text-sm text-[var(--stone)] mb-8">None yet.</p> : (
           <div className="space-y-3 mb-8">{customManga.map(m => (
             <div key={m.id} className="flex items-center gap-4 p-4 bg-[var(--paper-warm)] border border-[var(--mist)] rounded">

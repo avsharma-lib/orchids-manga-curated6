@@ -5,33 +5,33 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { use, useState } from 'react';
-import { formatPrice } from '@/lib/manga-data';
+import { formatPrice } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
 import { useCart } from '@/lib/cart-context';
 
 export default function BoxSetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getBoxSetById, getMangaById, allBoxSets } = useProducts();
-  const boxSet = getBoxSetById(id);
+  const { getTShirtById, getProductById, allBoxSets } = useProducts();
+  const tShirt = getTShirtById(id);
   const router = useRouter();
   const { addToCart } = useCart();
   const [imgError, setImgError] = useState(false);
 
-  if (!boxSet) {
+  if (!tShirt) {
     notFound();
   }
 
-  const relatedManga = getMangaById(boxSet.mangaId);
+  const relatedManga = getProductById(tShirt.productId);
 
   const handleAddToCart = () => {
     addToCart({
-      id: boxSet.id,
-      title: boxSet.title,
+      id: tShirt.id,
+      title: tShirt.title,
       author: relatedManga?.author || 'Various',
-      description: boxSet.description,
-      price: boxSet.price,
-      originalPrice: boxSet.originalPrice,
-      image: boxSet.image,
+      description: tShirt.description,
+      price: tShirt.price,
+      originalPrice: tShirt.originalPrice,
+      image: tShirt.image,
       genre: relatedManga?.genre || ['Manga'],
       rating: relatedManga?.rating || 4.5,
       volumes: 1,
@@ -44,8 +44,8 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
     router.push('/checkout');
   };
 
-  // Get other box sets for related section
-  const otherBoxSets = allBoxSets.filter(b => b.id !== boxSet.id).slice(0, 4);
+  // Get other T-Shirts for related section
+  const otherBoxSets = allBoxSets.filter(b => b.id !== tShirt.id).slice(0, 4);
 
   return (
     <div className="bg-[var(--paper)] pt-20">
@@ -56,7 +56,7 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
           <span>/</span>
           <Link href="/shop" className="hover:text-[var(--ink)] transition-colors">Shop</Link>
           <span>/</span>
-          <span className="text-[var(--ink)]">{boxSet.title}</span>
+          <span className="text-[var(--ink)]">{tShirt.title}</span>
         </nav>
       </div>
 
@@ -76,13 +76,13 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
                   {imgError ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-[var(--mist)]">
                       <span className="text-xl text-[var(--stone)] text-center px-4" style={{ fontFamily: 'var(--font-heading)' }}>
-                        {boxSet.title}
+                        {tShirt.title}
                       </span>
                     </div>
                   ) : (
                     <Image
-                      src={boxSet.image}
-                      alt={boxSet.title}
+                      src={tShirt.image}
+                      alt={tShirt.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
@@ -95,7 +95,7 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
                 {/* Badge */}
                 <div className="absolute top-4 left-4">
                   <span className="px-3 py-1.5 text-xs tracking-widest uppercase bg-[var(--crimson)] text-white">
-                    Box Set
+                    T-Shirt
                   </span>
                 </div>
               </div>
@@ -115,25 +115,25 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
                 className="text-4xl md:text-5xl lg:text-5xl text-[var(--ink)] mb-6"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                {boxSet.title}
+                {tShirt.title}
               </h1>
 
               {/* Price */}
               <div className="flex items-baseline gap-4 mb-8">
                 <span className="text-3xl font-medium text-[var(--ink)]">
-                  {formatPrice(boxSet.price)}
+                  {formatPrice(tShirt.price)}
                 </span>
                 <span className="text-lg text-[var(--stone)] line-through">
-                  {formatPrice(boxSet.originalPrice)}
+                  {formatPrice(tShirt.originalPrice)}
                 </span>
                 <span className="px-2 py-1 text-xs tracking-wider bg-[var(--crimson)] text-white">
-                  SAVE {Math.round((1 - boxSet.price / boxSet.originalPrice) * 100)}%
+                  SAVE {Math.round((1 - tShirt.price / tShirt.originalPrice) * 100)}%
                 </span>
               </div>
 
               {/* Description */}
               <p className="text-lg text-[var(--stone)] leading-relaxed mb-8">
-                {boxSet.description}
+                {tShirt.description}
               </p>
 
               {/* Service Info Box */}
@@ -179,20 +179,20 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
               {/* Details List */}
               <div className="border-t border-b border-[var(--mist)] py-6 mb-8 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--stone)]">Volumes Included</span>
-                  <span className="text-[var(--ink)]">{boxSet.volumesIncluded}</span>
+                  <span className="text-[var(--stone)]">Sizes Included</span>
+                  <span className="text-[var(--ink)]">{tShirt.sizesAvailable}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Publisher</span>
-                  <span className="text-[var(--ink)]">{boxSet.publisher}</span>
+                  <span className="text-[var(--ink)]">{tShirt.publisher}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Weight</span>
-                  <span className="text-[var(--ink)]">{boxSet.weight}</span>
+                  <span className="text-[var(--ink)]">{tShirt.weight}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Dimensions</span>
-                  <span className="text-[var(--ink)]">{boxSet.dimensions}</span>
+                  <span className="text-[var(--ink)]">{tShirt.dimensions}</span>
                 </div>
               </div>
 
@@ -224,7 +224,7 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
               {/* View Individual Manga */}
               {relatedManga && (
                 <Link
-                  href={`/manga/${relatedManga.id}`}
+                  href={`/product/${relatedManga.id}`}
                   className="block w-full mt-4 p-4 border-2 border-[var(--mist)] rounded-lg hover:border-[var(--ink)] transition-colors group text-center"
                 >
                   <span className="text-sm tracking-wider text-[var(--stone)] group-hover:text-[var(--ink)] transition-colors">
@@ -241,7 +241,7 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
                 <div className="divide-y divide-[var(--mist)]">
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Product Type</span>
-                    <span className="w-1/2 text-sm text-[var(--ink)]">Box Set</span>
+                    <span className="w-1/2 text-sm text-[var(--ink)]">T-Shirt</span>
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Series</span>
@@ -253,11 +253,11 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Publisher</span>
-                    <span className="w-1/2 text-sm text-[var(--ink)]">{boxSet.publisher}</span>
+                    <span className="w-1/2 text-sm text-[var(--ink)]">{tShirt.publisher}</span>
                   </div>
                   <div className="flex px-6 py-3">
-                    <span className="w-1/2 text-sm text-[var(--stone)]">Volumes Included</span>
-                    <span className="w-1/2 text-sm text-[var(--ink)]">{boxSet.volumesIncluded}</span>
+                    <span className="w-1/2 text-sm text-[var(--stone)]">Sizes Included</span>
+                    <span className="w-1/2 text-sm text-[var(--ink)]">{tShirt.sizesAvailable}</span>
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Material</span>
@@ -265,11 +265,11 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Weight</span>
-                    <span className="w-1/2 text-sm text-[var(--ink)]">{boxSet.weight}</span>
+                    <span className="w-1/2 text-sm text-[var(--ink)]">{tShirt.weight}</span>
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Dimensions</span>
-                    <span className="w-1/2 text-sm text-[var(--ink)]">{boxSet.dimensions}</span>
+                    <span className="w-1/2 text-sm text-[var(--ink)]">{tShirt.dimensions}</span>
                   </div>
                 </div>
               </div>
@@ -278,7 +278,7 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
         </div>
       </section>
 
-      {/* Other Box Sets */}
+      {/* Other T-Shirts */}
       {otherBoxSets.length > 0 && (
         <section className="py-24 bg-[var(--paper-warm)]">
           <div className="mx-auto max-w-7xl px-6 lg:px-12">
@@ -286,7 +286,7 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
               className="text-3xl md:text-4xl text-[var(--ink)] mb-12"
               style={{ fontFamily: 'var(--font-heading)' }}
             >
-              Other Box Sets
+              Other T-Shirts
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
               {otherBoxSets.map((bs, index) => (
@@ -309,14 +309,14 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
                       />
                       <div className="absolute top-2 left-2">
                         <span className="px-2 py-1 text-[10px] tracking-widest uppercase bg-[var(--crimson)] text-white">
-                          Box Set
+                          T-Shirt
                         </span>
                       </div>
                     </div>
                     <h3 className="text-sm font-medium text-[var(--ink)] mb-1 group-hover:text-[var(--crimson)] transition-colors line-clamp-2">
                       {bs.title}
                     </h3>
-                    <p className="text-xs text-[var(--stone)] mb-2">{bs.volumesIncluded}</p>
+                    <p className="text-xs text-[var(--stone)] mb-2">{bs.sizesAvailable}</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-sm font-medium text-[var(--ink)]">{formatPrice(bs.price)}</span>
                       <span className="text-xs text-[var(--stone)] line-through">{formatPrice(bs.originalPrice)}</span>

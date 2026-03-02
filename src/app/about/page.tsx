@@ -38,18 +38,18 @@ export default function AboutPage() {
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             Curated for <br />
-            <span className="text-[var(--crimson)] italic">Serious Readers</span>
+            <span className="text-[var(--crimson)] italic">Modern Style</span>
           </motion.h1>
 
           <motion.div variants={itemVariants} className="space-y-8 text-lg text-[var(--stone)] leading-relaxed">
             <p>
-              Inkai was born from a simple observation: the world of manga is vast, but true masterpieces are rare. 
+              Inkai was born from a simple observation: the world of fast fashion is vast, but true quality pieces are rare.
               We don&apos;t aim to provide everything. We aim to provide only what matters.
             </p>
             <p>
-              Our collection is hand-selected. Each title in our library has been chosen for its exceptional storytelling, 
-              groundbreaking art, and its contribution to the medium. From the dark, visceral depths of <span className="text-[var(--ink)] font-medium">Berserk</span> to 
-              the philosophical heights of <span className="text-[var(--ink)] font-medium">Vagabond</span>, we only carry works that demand to be read.
+              Our collection is hand-selected. Each piece in our catalog has been chosen for its exceptional quality,
+              groundbreaking design, and its contribution to modern style. From everyday essentials to
+              statement pieces, we only carry clothing that demands to be worn.
             </p>
           </motion.div>
 
@@ -65,9 +65,9 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="space-y-4">
-                <h3 className="text-xs tracking-widest uppercase text-[var(--crimson)]">The Medium as Art</h3>
+                <h3 className="text-xs tracking-widest uppercase text-[var(--crimson)]">Fashion as Art</h3>
                 <p className="text-sm text-[var(--stone)]">
-                  Manga is more than entertainment. It is a sophisticated form of visual and literary expression. We treat it with the respect it deserves.
+                  Clothing is more than functional. It is a sophisticated form of visual and personal expression. We treat it with the respect it deserves.
                 </p>
               </div>
             </div>
@@ -76,8 +76,8 @@ export default function AboutPage() {
           <motion.div variants={itemVariants} className="mt-24">
             <div className="relative aspect-[21/9] overflow-hidden grayscale contrast-125">
               <Image 
-                src="https://images.unsplash.com/photo-1578632292335-df3abbb0d586?q=80&w=2000&auto=format&fit=crop"
-                alt="Ink and Paper"
+                src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2000&auto=format&fit=crop"
+                alt="Modern Apparel"
                 fill
                 className="object-cover opacity-80"
               />

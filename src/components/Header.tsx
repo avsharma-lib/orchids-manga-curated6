@@ -52,18 +52,18 @@ export default function Header() {
   ];
 
   const browseLinks = [
-    { href: '/box-sets', label: 'All Box Sets' },
-    { href: '/action-figures', label: 'Action Figures' },
-    { href: '/katanas', label: 'Katanas' },
+    { href: '/t-shirts', label: 'All T-Shirts' },
+    { href: '/hoodies', label: 'Hoodies' },
+    { href: '/accessories', label: 'Accessories' },
   ];
 
   const quickNavLinks = [
-    { href: '/#featured', label: 'Featured Titles' },
+    { href: '/#featured', label: 'Featured Collections' },
     { href: '/shop?filter=new', label: 'New Arrivals' },
-    { href: '/#box-sets', label: 'Box Sets' },
-    { href: '/#action-figures', label: 'Action Figures' },
-    { href: '/#katanas', label: 'Katanas' },
-    { href: '/#genre', label: 'Genre' },
+    { href: '/#t-shirts', label: 'T-Shirts' },
+    { href: '/#hoodies', label: 'Hoodies' },
+    { href: '/#accessories', label: 'Accessories' },
+    { href: '/#categories', label: 'Categories' },
   ];
 
   return (

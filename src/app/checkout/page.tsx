@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useCart } from '@/lib/cart-context';
-import { formatPrice } from '@/lib/manga-data';
+import { formatPrice } from '@/lib/product-data';
 import { createOrder, getDeviceId, verifyCoupon } from '@/lib/supabase';
 
 const INDIA_STATES_CITIES: Record<string, string[]> = {

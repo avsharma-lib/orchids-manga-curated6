@@ -5,67 +5,67 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { use, useState } from 'react';
-import { formatPrice } from '@/lib/manga-data';
+import { formatPrice } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
 import { useCart } from '@/lib/cart-context';
-import MangaCard from '@/components/MangaCard';
+import ProductCard from '@/components/ProductCard';
 
-export default function MangaDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getMangaById, allManga, getProductInfo, getBoxSetsByMangaId } = useProducts();
-  const manga = getMangaById(id);
+  const { getProductById, allProducts, getProductInfo, getTShirtsByProductId } = useProducts();
+  const product = getProductById(id);
   const router = useRouter();
   const { addToCart } = useCart();
   const [imgError, setImgError] = useState(false);
   const productInfo = getProductInfo(id);
-  const boxSets = getBoxSetsByMangaId(id);
+  const tShirts = getTShirtsByProductId(id);
 
-  // Volume selection state
+  // Stock selection state
   const [selectionMode, setSelectionMode] = useState<'single' | 'multiple'>('single');
   const [singleVolumeNumber, setSingleVolumeNumber] = useState('1');
   const [multipleVolumeCount, setMultipleVolumeCount] = useState('1');
   const [volumeError, setVolumeError] = useState('');
 
-  if (!manga) {
+  if (!Product) {
     notFound();
   }
 
-  const maxVolumes = manga.volumes;
+  const maxStock = product.volumes;
 
   // Calculate price based on selection
   const calculatePrice = () => {
     if (selectionMode === 'single') {
-      return manga.price;
+      return product.price;
     } else {
       const count = parseInt(multipleVolumeCount) || 1;
-      // Price per volume is the base manga price (same as individual)
+      // Price per volume is the base Product price (same as individual)
       // Total = count * base price
-      return manga.price * count;
+      return product.price * count;
     }
   };
 
-  const validateSingleVolume = (value: string) => {
+  const validateSingleStock = (value: string) => {
     const num = parseInt(value);
     if (isNaN(num) || num < 1) {
       setVolumeError('Please enter a valid volume number');
       return false;
     }
-    if (num > maxVolumes) {
-      setVolumeError(`Maximum ${maxVolumes} volumes available`);
+    if (num > maxStock) {
+      setVolumeError(`Maximum ${maxStock} volumes available`);
       return false;
     }
     setVolumeError('');
     return true;
   };
 
-  const validateMultipleVolumes = (value: string) => {
+  const validateMultipleStock = (value: string) => {
     const num = parseInt(value);
     if (isNaN(num) || num < 1) {
       setVolumeError('Please enter a valid number');
       return false;
     }
-    if (num > maxVolumes) {
-      setVolumeError(`Maximum ${maxVolumes} volumes available`);
+    if (num > maxStock) {
+      setVolumeError(`Maximum ${maxStock} volumes available`);
       return false;
     }
     setVolumeError('');
@@ -77,18 +77,18 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
       if (!validateSingleVolume(singleVolumeNumber)) return;
       const volumeNum = parseInt(singleVolumeNumber);
       addToCart({
-        ...manga,
-        id: `${manga.id}-vol-${volumeNum}`,
-        title: `${manga.title} - Volume ${volumeNum}`,
-        price: manga.price,
+        ...Product,
+        id: `${product.id}-vol-${volumeNum}`,
+        title: `${product.title} - Stock ${volumeNum}`,
+        price: product.price,
       });
     } else {
-      if (!validateMultipleVolumes(multipleVolumeCount)) return;
+      if (!validateMultipleStock(multipleVolumeCount)) return;
       const count = parseInt(multipleVolumeCount);
       addToCart({
-        ...manga,
-        id: `${manga.id}-vols-1-${count}`,
-        title: `${manga.title} - Volumes 1-${count}`,
+        ...Product,
+        id: `${product.id}-vols-1-${count}`,
+        title: `${product.title} - Stock 1-${count}`,
         price: calculatePrice(),
       });
     }
@@ -100,14 +100,14 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
         if (!validateSingleVolume(singleVolumeNumber)) return;
         const volumeNum = parseInt(singleVolumeNumber);
         buyItem = {
-          manga: { ...manga, id: `${manga.id}-vol-${volumeNum}`, title: `${manga.title} - Volume ${volumeNum}`, price: manga.price },
+          product: { ...Product, id: `${product.id}-vol-${volumeNum}`, title: `${product.title} - Stock ${volumeNum}`, price: product.price },
           quantity: 1,
         };
       } else {
-        if (!validateMultipleVolumes(multipleVolumeCount)) return;
+        if (!validateMultipleStock(multipleVolumeCount)) return;
         const count = parseInt(multipleVolumeCount);
         buyItem = {
-          manga: { ...manga, id: `${manga.id}-vols-1-${count}`, title: `${manga.title} - Volumes 1-${count}`, price: calculatePrice() },
+          product: { ...Product, id: `${product.id}-vols-1-${count}`, title: `${product.title} - Stock 1-${count}`, price: calculatePrice() },
           quantity: 1,
         };
       }
@@ -115,9 +115,9 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
       router.push('/checkout?mode=buynow');
     };
 
-  // Get related manga (same genre, excluding current)
-  const relatedManga = allManga
-    .filter(m => m.id !== manga.id && m.genre.some(g => manga.genre.includes(g)))
+  // Get related Product (same genre, excluding current)
+  const relatedProducts = allProducts
+    .filter(m => m.id !== product.id && p.genre.some(g => product.genre.includes(g)))
     .slice(0, 4);
 
   return (
@@ -129,7 +129,7 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
           <span>/</span>
           <Link href="/shop" className="hover:text-[var(--ink)] transition-colors">Shop</Link>
           <span>/</span>
-          <span className="text-[var(--ink)]">{manga.title}</span>
+          <span className="text-[var(--ink)]">{product.title}</span>
         </nav>
       </div>
 
@@ -149,13 +149,13 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                   {imgError ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-[var(--mist)]">
                       <span className="text-xl text-[var(--stone)] text-center px-4" style={{ fontFamily: 'var(--font-heading)' }}>
-                        {manga.title}
+                        {product.title}
                       </span>
                     </div>
                   ) : (
                     <Image
-                      src={manga.image}
-                      alt={manga.title}
+                      src={product.image}
+                      alt={product.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
@@ -167,12 +167,12 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                 </div>
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  {manga.new && (
+                  {product.new && (
                     <span className="px-3 py-1.5 text-xs tracking-widest uppercase bg-[var(--crimson)] text-white">
                       New
                     </span>
                   )}
-                  {manga.featured && (
+                  {product.featured && (
                     <span className="px-3 py-1.5 text-xs tracking-widest uppercase bg-[var(--ink)] text-white">
                       Featured
                     </span>
@@ -189,13 +189,13 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
               className="lg:py-8"
             >
               <p className="text-sm tracking-wider text-[var(--stone)] mb-2">
-                {manga.author}
+                {product.author}
               </p>
               <h1
                 className="text-4xl md:text-5xl lg:text-6xl text-[var(--ink)] mb-6"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
-                {manga.title}
+                {product.title}
               </h1>
 
               {/* Rating */}
@@ -204,7 +204,7 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className={`w-4 h-4 ${i < Math.floor(manga.rating) ? 'text-[var(--crimson)]' : 'text-[var(--mist)]'}`}
+                      className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'text-[var(--crimson)]' : 'text-[var(--mist)]'}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -212,7 +212,7 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                     </svg>
                   ))}
                 </div>
-                <span className="text-sm text-[var(--stone)]">{manga.rating} / 5</span>
+                <span className="text-sm text-[var(--stone)]">{product.rating} / 5</span>
               </div>
 
               {/* Price */}
@@ -223,10 +223,10 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                 {selectionMode === 'single' && (
                   <>
                     <span className="text-lg text-[var(--stone)] line-through">
-                      {formatPrice(manga.originalPrice)}
+                      {formatPrice(product.originalPrice)}
                     </span>
                     <span className="px-2 py-1 text-xs tracking-wider bg-[var(--crimson)] text-white">
-                      SAVE {Math.round((1 - manga.originalPrice / manga.price) * -100)}%
+                      SAVE {Math.round((1 - product.originalPrice / product.price) * -100)}%
                     </span>
                   </>
                 )}
@@ -234,13 +234,13 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
 
               {/* Description */}
               <p className="text-lg text-[var(--stone)] leading-relaxed mb-8">
-                {manga.description}
+                {product.description}
               </p>
 
-              {/* Volume Selection */}
+              {/* Stock Selection */}
               <div className="mb-8 p-6 border border-[var(--mist)] rounded-lg bg-[var(--paper-warm)]">
                 <h3 className="text-lg font-medium text-[var(--ink)] mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-                  Select Volumes
+                  Select Stock
                 </h3>
                 
                 {/* Selection Mode Toggle */}
@@ -263,20 +263,20 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                         : 'bg-transparent text-[var(--stone)] border-[var(--mist)] hover:border-[var(--ink)]'
                     }`}
                   >
-                    Select Multiple Volumes
+                    Select Multiple Stock
                   </button>
                 </div>
 
-                {/* Volume Input */}
+                {/* Stock Input */}
                 {selectionMode === 'single' ? (
                   <div>
                     <label className="block text-sm text-[var(--stone)] mb-2">
-                      Enter Volume Number (1-{maxVolumes})
+                      Enter Stock Number (1-{maxStock})
                     </label>
                     <input
                       type="number"
                       min="1"
-                      max={maxVolumes}
+                      max={maxStock}
                       value={singleVolumeNumber}
                       onChange={(e) => {
                         setSingleVolumeNumber(e.target.value);
@@ -294,17 +294,17 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                     <input
                       type="number"
                       min="1"
-                      max={maxVolumes}
+                      max={maxStock}
                       value={multipleVolumeCount}
                       onChange={(e) => {
                         setMultipleVolumeCount(e.target.value);
-                        validateMultipleVolumes(e.target.value);
+                        validateMultipleStock(e.target.value);
                       }}
                       className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
                       placeholder="e.g., 10 means volumes 1-10"
                     />
                     <p className="mt-2 text-xs text-[var(--stone)]">
-                      Example: Enter 10 to get Volumes 1-10
+                      Example: Enter 10 to get Stock 1-10
                     </p>
                   </div>
                 )}
@@ -357,16 +357,16 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
               {/* Details List */}
               <div className="border-t border-b border-[var(--mist)] py-6 mb-8 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[var(--stone)]">Volumes</span>
-                  <span className="text-[var(--ink)]">{manga.volumes}</span>
+                  <span className="text-[var(--stone)]">Stock</span>
+                  <span className="text-[var(--ink)]">{product.volumes}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Status</span>
-                  <span className="text-[var(--ink)] capitalize">{manga.status}</span>
+                  <span className="text-[var(--ink)] capitalize">{product.status}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Genre</span>
-                  <span className="text-[var(--ink)]">{manga.genre.join(', ')}</span>
+                  <span className="text-[var(--ink)]">{product.genre.join(', ')}</span>
                 </div>
               </div>
 
@@ -443,15 +443,15 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
                     <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.productType}</span>
                   </div>
                   <div className="flex px-6 py-3">
-                    <span className="w-1/2 text-sm text-[var(--stone)]">Author Name</span>
-                    <span className="w-1/2 text-sm text-[var(--ink)]">{manga.author}</span>
+                    <span className="w-1/2 text-sm text-[var(--stone)]">Brand Name</span>
+                    <span className="w-1/2 text-sm text-[var(--ink)]">{product.author}</span>
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Name of Publisher</span>
                     <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.publisher}</span>
                   </div>
                   <div className="flex px-6 py-3">
-                    <span className="w-1/2 text-sm text-[var(--stone)]">Volumes</span>
+                    <span className="w-1/2 text-sm text-[var(--stone)]">Stock</span>
                     <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.volumes}</span>
                   </div>
                   <div className="flex px-6 py-3">
@@ -482,7 +482,7 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
       </section>
 
       {/* Related */}
-      {relatedManga.length > 0 && (
+      {relatedProducts.length > 0 && (
         <section className="py-24 bg-[var(--paper-warm)]">
           <div className="mx-auto max-w-7xl px-6 lg:px-12">
             <h2
@@ -492,8 +492,8 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
               You May Also Like
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
-              {relatedManga.map((m, index) => (
-                <MangaCard key={m.id} manga={m} index={index} />
+              {relatedProducts.map((p, index) => (
+                <ProductCard key={p.id} Product={m} index={index} />
               ))}
             </div>
           </div>

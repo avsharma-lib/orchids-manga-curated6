@@ -8,9 +8,9 @@ import { CartProvider } from "@/lib/cart-context";
 import { ProductsProvider } from "@/lib/products-context";
 
 export const metadata: Metadata = {
-  title: "Inkai | Curated Manga for Serious Readers",
+  title: "Inkai | Premium Apparel for the Modern Wardrobe",
   description:
-    "A premium manga e-commerce store offering curated collections for discerning readers. Quality over quantity.",
+    "A premium apparel e-commerce store offering curated collections for the modern wardrobe. Quality over quantity.",
 };
 
 export default function RootLayout({

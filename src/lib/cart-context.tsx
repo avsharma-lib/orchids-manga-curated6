@@ -1,18 +1,18 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Manga } from '@/lib/manga-data';
+import { Product } from '@/lib/product-data';
 
 interface CartItem {
-  manga: Manga;
+  product: Product;
   quantity: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (manga: Manga) => void;
-  removeFromCart: (mangaId: string) => void;
-  updateQuantity: (mangaId: string, quantity: number) => void;
+  addToCart: (product: Product) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -42,12 +42,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, mounted]);
 
-  const addToCart = (manga: Manga) => {
+  const addToCart = (product: Product) => {
     setItems(prev => {
-      const existing = prev.find(item => item.manga.id === manga.id);
+      const existing = prev.find(item => item.product.id === product.id);
       if (existing) {
         return prev.map(item =>
-          item.manga.id === manga.id
+          item.product.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -56,18 +56,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeFromCart = (mangaId: string) => {
-    setItems(prev => prev.filter(item => item.manga.id !== mangaId));
+  const removeFromCart = (productId: string) => {
+    setItems(prev => prev.filter(item => item.product.id !== productId));
   };
 
-  const updateQuantity = (mangaId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     if (quantity < 1) {
-      removeFromCart(mangaId);
+      removeFromCart(productId);
       return;
     }
     setItems(prev =>
       prev.map(item =>
-        item.manga.id === mangaId ? { ...item, quantity } : item
+        item.product.id === productId ? { ...item, quantity } : item
       )
     );
   };
@@ -77,7 +77,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.manga.price * item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
   return (
     <CartContext.Provider

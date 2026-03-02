@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getOrdersByDeviceId, getDeviceId, Order } from '@/lib/supabase';
-import { formatPrice } from '@/lib/manga-data';
+import { formatPrice } from '@/lib/product-data';
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered'];
 

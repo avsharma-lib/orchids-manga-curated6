@@ -5,15 +5,15 @@ export const dynamic = 'force-dynamic';
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { formatPrice } from '@/lib/manga-data';
+import { formatPrice } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
-import MangaCard from '@/components/MangaCard';
+import ProductCard from '@/components/ProductCard';
 
 type SortOption = 'popular' | 'price-low' | 'price-high' | 'title' | 'newest';
 
 export default function ShopPage() {
   const searchParams = useSearchParams();
-  const { allManga, allGenres } = useProducts();
+  const { allProducts, allGenres } = useProducts();
   const initialGenre = searchParams.get('genre') || '';
   const initialFilter = searchParams.get('filter') || '';
 
@@ -28,8 +28,8 @@ export default function ShopPage() {
     setSpecialFilter(searchParams.get('filter') || '');
   }, [searchParams]);
 
-  const filteredManga = useMemo(() => {
-    let result = [...allManga];
+  const filteredProducts = useMemo(() => {
+    let result = [...allProducts];
 
     // Special filters
     if (specialFilter === 'featured') {
@@ -66,7 +66,7 @@ export default function ShopPage() {
     }
 
     return result;
-  }, [selectedGenre, sortBy, priceRange, specialFilter, allManga]);
+  }, [selectedGenre, sortBy, priceRange, specialFilter, allProducts]);
 
   const clearFilters = () => {
     setSelectedGenre('');
@@ -96,10 +96,10 @@ export default function ShopPage() {
             >
               {specialFilter === 'featured' ? 'Featured Titles' : 
                specialFilter === 'new' ? 'New Arrivals' :
-               selectedGenre ? selectedGenre : 'All Manga'}
+               selectedGenre ? selectedGenre : 'All Product'}
             </h1>
             <p className="mt-4 text-[var(--stone)]">
-              {filteredManga.length} {filteredManga.length === 1 ? 'title' : 'titles'} available
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'title' : 'titles'} available
             </p>
           </motion.div>
         </div>
@@ -288,15 +288,15 @@ export default function ShopPage() {
           )}
 
           {/* Grid */}
-          {filteredManga.length > 0 ? (
+          {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-              {filteredManga.map((manga, index) => (
-                <MangaCard key={manga.id} manga={manga} index={index} />
+              {filteredProducts.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
           ) : (
             <div className="py-24 text-center">
-              <p className="text-[var(--stone)]">No manga found matching your filters.</p>
+              <p className="text-[var(--stone)]">No product found matching your filters.</p>
               <button
                 onClick={clearFilters}
                 className="mt-4 text-sm text-[var(--crimson)] hover:text-[var(--crimson-muted)] underline"

@@ -535,16 +535,4 @@ CREATE POLICY "Allow all access to custom_katanas" ON custom_katanas FOR ALL USI
 
 ALTER TABLE product_images ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow all access to product_images" ON product_images FOR ALL USING (true) WITH CHECK (true);
-
--- Coupons table
-CREATE TABLE IF NOT EXISTS custom_coupons (
-  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  code TEXT NOT NULL UNIQUE,
-  discount_percent INTEGER NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- RLS for Coupons
-ALTER TABLE custom_coupons ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all access to custom_coupons" ON custom_coupons FOR ALL USING (true) WITH CHECK (true);
 `;

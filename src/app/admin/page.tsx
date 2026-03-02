@@ -7,7 +7,7 @@ import { getAllOrders, updateOrderStatus, Order, addCustomManga, addCustomBoxSet
 import { formatPrice, genres as staticGenres } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
 
-const ADMIN_CODES = ['ADMIN AARYAVEER', 'ADMIN SOHAM'];
+const ADMIN_CODES = ['ADMIN'];
 
 type AdminTab = 'orders' | 'add-product' | 'add-t-shirt' | 'add-hoodie' | 'add-accessory' | 'products' | 'coupons' | 'setup';
 
@@ -37,6 +37,7 @@ function ImageUpload({ value, onChange, label = 'Image', aspect = 'aspect-[2/3]'
       reader.onload = async () => {
         const base64 = (reader.result as string).split(',')[1];
         const url = await uploadProductImage(base64, file.type);
+        if (!url) throw new Error('Failed to get URL');
         onChange(url);
         setUploading(false);
       };
@@ -363,8 +364,8 @@ function AddMangaTab({ allManga, refreshProducts, loadCustomProducts }: {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setSuccess('');
-    if (!form.title || !form.author || !form.price || !form.image) { setError('Fill required fields'); return; }
-    if (allManga.some(m => m.id === form.id)) { setError('ID already exists'); return; }
+    if (!form.title || !form.author || !form.price) { setError('Fill required fields'); return; }
+    if (allManga.some(m => m.id === form.id)) { console.warn('ID already exists'); /* Ignore to allow overwrite/add */ }
     setSubmitting(true);
     try {
       await addCustomManga({
@@ -429,7 +430,7 @@ function AddBoxSetTab({ allManga, refreshProducts, loadCustomProducts }: {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setSuccess('');
-    if (!form.title || !form.price || !form.image) { setError('Fill required fields'); return; }
+    if (!form.title || !form.price) { setError('Fill required fields'); return; }
     setSubmitting(true);
     try {
       await addCustomBoxSet({ id: form.id || generateId(form.title), manga_id: form.mangaId || null, title: form.title, description: form.description, image: form.image, price: parseInt(form.price), original_price: parseInt(form.originalPrice) || parseInt(form.price) * 2, volumes_included: form.volumesIncluded, publisher: form.publisher, weight: form.weight, dimensions: form.dimensions });

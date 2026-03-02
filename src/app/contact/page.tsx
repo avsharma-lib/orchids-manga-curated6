@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
-const ADMIN_CODES = ['ADMIN AARYAVEER', 'ADMIN SOHAM'];
+const ADMIN_CODES = ['ADMIN'];
 
 export default function ContactPage() {
   const router = useRouter();
@@ -35,7 +35,7 @@ export default function ContactPage() {
     }
     
     // Normal form submission - open email client
-    const mailtoLink = `mailto:inkaimangastore@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`From: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
+    const mailtoLink = `mailto:dripinkai@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`From: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`;
     window.location.href = mailtoLink;
   };
 
@@ -76,16 +76,11 @@ export default function ContactPage() {
                   Direct Contact
                 </h3>
                 <div className="space-y-4">
+
                   <p className="flex items-center gap-4 text-lg text-[var(--stone)] group">
                     <span className="w-12 h-px bg-[var(--mist)] group-hover:w-16 group-hover:bg-[var(--crimson)] transition-all" />
-                    <a href="tel:+919109591879" className="hover:text-[var(--ink)] transition-colors">
-                      +91 91095 91879
-                    </a>
-                  </p>
-                  <p className="flex items-center gap-4 text-lg text-[var(--stone)] group">
-                    <span className="w-12 h-px bg-[var(--mist)] group-hover:w-16 group-hover:bg-[var(--crimson)] transition-all" />
-                    <a href="mailto:inkaimangastore@gmail.com" className="hover:text-[var(--ink)] transition-colors">
-                      inkaimangastore@gmail.com
+                    <a href="mailto:dripinkai@gmail.com" className="hover:text-[var(--ink)] transition-colors">
+                      dripinkai@gmail.com
                     </a>
                   </p>
                 </div>

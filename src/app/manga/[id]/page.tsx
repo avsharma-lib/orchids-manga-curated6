@@ -8,7 +8,7 @@ import { use, useState } from 'react';
 import { formatPrice } from '@/lib/manga-data';
 import { useProducts } from '@/lib/products-context';
 import { useCart } from '@/lib/cart-context';
-import MangaCard from '@/components/MangaCard';
+import ClothesCard from '@/components/ClothesCard';
 
 export default function MangaDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -493,7 +493,7 @@ export default function MangaDetailPage({ params }: { params: Promise<{ id: stri
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
               {relatedManga.map((m, index) => (
-                <MangaCard key={m.id} manga={m} index={index} />
+                <ClothesCard key={m.id} manga={m} index={index} />
               ))}
             </div>
           </div>

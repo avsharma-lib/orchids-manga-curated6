@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatPrice } from '@/lib/manga-data';
 import { useProducts } from '@/lib/products-context';
-import MangaCard from '@/components/MangaCard';
+import ClothesCard from '@/components/ClothesCard';
 
 type SortOption = 'popular' | 'price-low' | 'price-high' | 'title' | 'newest';
 
@@ -291,7 +291,7 @@ export default function ShopPage() {
           {filteredManga.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
               {filteredManga.map((manga, index) => (
-                <MangaCard key={manga.id} manga={manga} index={index} />
+                <ClothesCard key={manga.id} manga={manga} index={index} />
               ))}
             </div>
           ) : (

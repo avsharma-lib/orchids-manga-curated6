@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { formatPrice } from '@/lib/manga-data';
 import { useProducts } from '@/lib/products-context';
-import MangaCard from '@/components/MangaCard';
+import ClothesCard from '@/components/ClothesCard';
 
 export default function HomePage() {
   const { allManga, allBoxSets, allActionFigures, allKatanas, allGenres, getFeaturedManga, getNewManga } = useProducts();
@@ -51,7 +51,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
             {featuredManga.slice(0, 8).map((manga, index) => (
-              <MangaCard key={manga.id} manga={manga} index={index} />
+              <ClothesCard key={manga.id} manga={manga} index={index} />
             ))}
           </div>
         </div>
@@ -103,7 +103,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
             {newManga.map((manga, index) => (
-              <MangaCard key={manga.id} manga={manga} index={index} />
+              <ClothesCard key={manga.id} manga={manga} index={index} />
             ))}
           </div>
         </div>
@@ -250,7 +250,7 @@ export default function HomePage() {
               <Link href="/shop?genre=Dark+Fantasy" className="text-sm tracking-wider text-[var(--stone)] hover:text-[var(--ink)] transition-colors">View All</Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {darkFantasyManga.map((manga, index) => (<MangaCard key={manga.id} manga={manga} index={index} />))}
+              {darkFantasyManga.map((manga, index) => (<ClothesCard key={manga.id} manga={manga} index={index} />))}
             </div>
           </div>
           <div>
@@ -259,7 +259,7 @@ export default function HomePage() {
               <Link href="/shop?genre=Horror" className="text-sm tracking-wider text-[var(--stone)] hover:text-[var(--ink)] transition-colors">View All</Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {horrorManga.map((manga, index) => (<MangaCard key={manga.id} manga={manga} index={index} />))}
+              {horrorManga.map((manga, index) => (<ClothesCard key={manga.id} manga={manga} index={index} />))}
             </div>
           </div>
         </div>

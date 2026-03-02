@@ -1,0 +1,19 @@
+   ▲ Next.js 15.5.7
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.0.2:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 2s
+ ○ Compiling / ...
+ ✓ Compiled / in 10.9s (1567 modules)
+ GET / 200 in 12907ms
+ ○ Compiling /shop ...
+ ✓ Compiled /shop in 986ms (1578 modules)
+ GET / 200 in 789ms
+ GET /shop 200 in 1909ms
+ ✓ Compiled in 10.3s (1578 modules)

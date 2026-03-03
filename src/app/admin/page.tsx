@@ -32,21 +32,25 @@ function ImageUpload({ value, onChange, label = 'Image', aspect = 'aspect-[2/3]'
     }
 
     setUploading(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = async () => {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
         const base64 = (reader.result as string).split(',')[1];
         const url = await uploadProductImage(base64, file.type);
         if (!url) throw new Error('Failed to get URL');
         onChange(url);
+      } catch (err: any) {
+        console.error('Upload failed:', err);
+        alert('Upload failed: ' + (err.message || 'Try using a URL instead.'));
+      } finally {
         setUploading(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      console.error('Upload failed:', err);
-      alert('Upload failed. Try using a URL instead.');
+      }
+    };
+    reader.onerror = () => {
+      alert('Failed to read file');
       setUploading(false);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -364,14 +368,14 @@ function AddMangaTab({ allManga, refreshProducts, loadCustomProducts }: {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(''); setSuccess('');
-    if (!form.title || !form.author || !form.price) { setError('Fill required fields'); return; }
+    if (!form.title || !form.author || !form.price) { setError('Fill required title, brand, and price'); return; }
     if (allManga.some(m => m.id === form.id)) { console.warn('ID already exists'); /* Ignore to allow overwrite/add */ }
     setSubmitting(true);
     try {
       await addCustomManga({
         id: form.id, title: form.title, author: form.author, description: form.description,
-        price: parseInt(form.price), original_price: parseInt(form.originalPrice) || parseInt(form.price) * 2,
-        image: form.image, genre: form.genre, rating: parseFloat(form.rating) || 4.5,
+        price: parseInt(form.price) || 0, original_price: parseInt(form.originalPrice) || (parseInt(form.price) || 0) * 2,
+        image: form.image || 'https://via.placeholder.com/400x600', genre: form.genre, rating: parseFloat(form.rating) || 4.5,
         volumes: parseInt(form.volumes) || 1, status: form.status,
         featured: form.featured || form.section === 'featured',
         is_new: form.isNew || form.section === 'new',
@@ -430,10 +434,12 @@ function AddBoxSetTab({ allManga, refreshProducts, loadCustomProducts }: {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setSuccess('');
-    if (!form.title || !form.price) { setError('Fill required fields'); return; }
+    if (!form.title || !form.price) { setError('Fill required title and price'); return; }
     setSubmitting(true);
     try {
-      await addCustomBoxSet({ id: form.id || generateId(form.title), manga_id: form.mangaId || null, title: form.title, description: form.description, image: form.image, price: parseInt(form.price), original_price: parseInt(form.originalPrice) || parseInt(form.price) * 2, volumes_included: form.volumesIncluded, publisher: form.publisher, weight: form.weight, dimensions: form.dimensions });
+      const price = parseInt(form.price) || 0;
+      const originalPrice = parseInt(form.originalPrice) || price * 2;
+      await addCustomBoxSet({ id: form.id || generateId(form.title), manga_id: form.mangaId || null, title: form.title, description: form.description || '', image: form.image || 'https://via.placeholder.com/400x600', price: price, original_price: originalPrice, volumes_included: form.volumesIncluded || '', publisher: form.publisher || '', weight: form.weight || '', dimensions: form.dimensions || '' });
       setSuccess(`"${form.title}" added!`); await refreshProducts(); await loadCustomProducts();
       setForm({ id: '', mangaId: '', title: '', description: '', image: '', price: '', originalPrice: '', volumesIncluded: '', publisher: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
@@ -477,10 +483,12 @@ function AddActionFigureTab({ refreshProducts, loadCustomProducts }: { refreshPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setError(''); setSuccess('');
-    if (!form.title || !form.price || !form.image) { setError('Fill required fields'); return; }
+    if (!form.title || !form.price) { setError('Fill required title and price'); return; }
     setSubmitting(true);
     try {
-      await addCustomActionFigure({ id: generateId(form.title), title: form.title, description: form.description, price: parseInt(form.price), original_price: parseInt(form.originalPrice) || parseInt(form.price) * 2, image: form.image, brand: form.brand, character_name: form.characterName, series: form.series, material: form.material, height: form.height, weight: form.weight, dimensions: form.dimensions });
+      const price = parseInt(form.price) || 0;
+      const originalPrice = parseInt(form.originalPrice) || price * 2;
+      await addCustomActionFigure({ id: generateId(form.title), title: form.title, description: form.description || '', price: price, original_price: originalPrice, image: form.image || 'https://via.placeholder.com/400x600', brand: form.brand || '', character_name: form.characterName || '', series: form.series || '', material: form.material || '', height: form.height || '', weight: form.weight || '', dimensions: form.dimensions || '' });
       setSuccess(`"${form.title}" added!`); await refreshProducts(); await loadCustomProducts();
       setForm({ title: '', description: '', price: '', originalPrice: '', image: '', brand: '', characterName: '', series: '', material: 'PVC', height: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
@@ -533,7 +541,9 @@ function AddKatanaTab({ refreshProducts, loadCustomProducts }: { refreshProducts
     if (!form.title || !form.price || !form.image) { setError('Fill required fields'); return; }
     setSubmitting(true);
     try {
-      await addCustomKatana({ id: generateId(form.title), title: form.title, description: form.description, price: parseInt(form.price), original_price: parseInt(form.originalPrice) || parseInt(form.price) * 2, image: form.image, blade_material: form.bladeMaterial, handle_material: form.handleMaterial, blade_length: form.bladeLength, total_length: form.totalLength, weight: form.weight, series: form.series });
+      const price = parseInt(form.price) || 0;
+      const originalPrice = parseInt(form.originalPrice) || price * 2;
+      await addCustomKatana({ id: generateId(form.title), title: form.title, description: form.description || '', price: price, original_price: originalPrice, image: form.image || 'https://via.placeholder.com/400x600', blade_material: form.bladeMaterial || '', handle_material: form.handleMaterial || '', blade_length: form.bladeLength || '', total_length: form.totalLength || '', weight: form.weight || '', series: form.series || '' });
       setSuccess(`"${form.title}" added!`); await refreshProducts(); await loadCustomProducts();
       setForm({ title: '', description: '', price: '', originalPrice: '', image: '', bladeMaterial: 'Stainless Steel', handleMaterial: 'Wood', bladeLength: '', totalLength: '', weight: '', series: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }

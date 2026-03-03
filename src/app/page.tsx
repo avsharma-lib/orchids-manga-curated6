@@ -7,6 +7,7 @@ import { formatPrice } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
 import ProductCard from '@/components/ProductCard';
 import LoadingScreen from '@/components/LoadingScreen';
+import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 
 export default function HomePage() {
   const { allProducts, allTShirts, allHoodies, allAccessories, allGenres, getFeaturedProduct, getNewProduct } = useProducts();
@@ -24,42 +25,38 @@ export default function HomePage() {
       <LoadingScreen />
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-8">
+      <section className="relative pt-24 min-h-[120vh]">
         <div className="absolute inset-0 opacity-[0.02]">
           <div className="absolute inset-0" style={{
             backgroundImage: `repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 1px, transparent 1px, transparent 60px),
                              repeating-linear-gradient(0deg, var(--ink) 0px, var(--ink) 1px, transparent 1px, transparent 60px)`
           }} />
         </div>
-        <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 pt-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 3 }}>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl leading-[0.9] tracking-tight text-[var(--ink)]" style={{ fontFamily: 'var(--font-heading)' }}>
-              Premium Apparel for<br />
-              <span className="italic text-[var(--crimson)]">Modern</span> Style
-            </h1>
-            <p className="mt-6 max-w-xl mx-auto text-lg text-[var(--stone)] leading-relaxed">
-              A carefully selected collection of the finest clothing. No filler. No compromise. Only the pieces that define modern style.
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Parallax Image Section */}
-        <div className="relative mt-12 z-0 h-[60vh] md:h-[80vh] w-full sticky top-0">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 3.5 }}
-            className="w-full h-full relative"
-          >
-            <Image
-              src="/assets/images/home/homepage-apparel.jpg"
-              alt="Premium Apparel Collection"
-              fill
-              className="object-cover"
-              priority
-            />
-          </motion.div>
-        </div>
+        <ContainerScroll
+          titleComponent={
+            <div className="mx-auto max-w-7xl px-6 lg:px-12 pt-8 text-center pb-8">
+              <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 3 }}>
+                <h1 className="text-4xl md:text-6xl lg:text-7xl leading-[0.9] tracking-tight text-[var(--ink)]" style={{ fontFamily: 'var(--font-heading)' }}>
+                  Premium Apparel for<br />
+                  <span className="italic text-[var(--crimson)]">Modern</span> Style
+                </h1>
+                <p className="mt-6 max-w-xl mx-auto text-lg text-[var(--stone)] leading-relaxed">
+                  A carefully selected collection of the finest clothing. No filler. No compromise. Only the pieces that define modern style.
+                </p>
+              </motion.div>
+            </div>
+          }
+        >
+          <Image
+            src="/assets/images/home/homepage-apparel.jpg"
+            alt="Premium Apparel Collection"
+            height={720}
+            width={1400}
+            className="mx-auto rounded-2xl object-cover h-full object-center"
+            draggable={false}
+            priority
+          />
+        </ContainerScroll>
       </section>
 
       {/* Content wrapper with a solid background and higher z-index to slide over the sticky image */}

@@ -82,7 +82,7 @@ function ImageUpload({ value, onChange, label = 'Image', aspect = 'aspect-[2/3]'
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isCollectionized, setIsBrandized] = useState(false);
+  const [isBrandized, setIsBrandized] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<AdminTab>('orders');
   const { allManga, allBoxSets, refreshProducts } = useProducts();

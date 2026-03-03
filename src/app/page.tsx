@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { formatPrice } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
 import ProductCard from '@/components/ProductCard';
+import LoadingScreen from '@/components/LoadingScreen';
 
 export default function HomePage() {
   const { allProducts, allTShirts, allHoodies, allAccessories, allGenres, getFeaturedProduct, getNewProduct } = useProducts();
@@ -20,6 +21,8 @@ export default function HomePage() {
 
   return (
     <div className="bg-[var(--paper)]">
+      <LoadingScreen />
+
       {/* Hero Section */}
       <section className="relative pt-24 pb-8">
         <div className="absolute inset-0 opacity-[0.02]">
@@ -29,7 +32,7 @@ export default function HomePage() {
           }} />
         </div>
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 pt-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 3 }}>
             <h1 className="text-4xl md:text-6xl lg:text-7xl leading-[0.9] tracking-tight text-[var(--ink)]" style={{ fontFamily: 'var(--font-heading)' }}>
               Premium Apparel for<br />
               <span className="italic text-[var(--crimson)]">Modern</span> Style
@@ -39,9 +42,29 @@ export default function HomePage() {
             </p>
           </motion.div>
         </div>
+
+        {/* Parallax Image Section */}
+        <div className="relative mt-12 z-0 h-[60vh] md:h-[80vh] w-full sticky top-0">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 3.5 }}
+            className="w-full h-full relative"
+          >
+            <Image
+              src="/assets/images/home/homepage-apparel.jpg"
+              alt="Premium Apparel Collection"
+              fill
+              className="object-cover"
+              priority
+            />
+          </motion.div>
+        </div>
       </section>
 
-      {/* Featured Section */}
+      {/* Content wrapper with a solid background and higher z-index to slide over the sticky image */}
+      <div className="relative z-10 bg-[var(--paper)]">
+        {/* Featured Section */}
       <section id="featured" className="py-8">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
           <div className="flex items-end justify-between mb-8">
@@ -296,6 +319,7 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+      </div>
     </div>
   );
 }

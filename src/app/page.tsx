@@ -24,8 +24,20 @@ export default function HomePage() {
     <div className="bg-[var(--paper)]">
       <LoadingScreen />
 
+      {/* Top Banner Image Section */}
+      <div className="w-full pt-16">
+        <Image
+          src="/assets/images/home/header_image.jpg"
+          alt="Inkai Streetwear Banner"
+          width={1920}
+          height={1080}
+          className="w-full h-auto object-cover"
+          priority
+        />
+      </div>
+
       {/* Hero Section */}
-      <section className="relative pt-24 min-h-[120vh]">
+      <section className="relative pt-12 min-h-[120vh]">
         <div className="absolute inset-0 opacity-[0.02]">
           <div className="absolute inset-0" style={{
             backgroundImage: `repeating-linear-gradient(90deg, var(--ink) 0px, var(--ink) 1px, transparent 1px, transparent 60px),

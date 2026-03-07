@@ -356,7 +356,7 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     id: '', title: '', author: '', description: '', price: '', originalPrice: '',
-    image: '', genre: [] as string[], sizes: [] as string[], rating: '4.5', volumes: '', status: 'completed',
+    image: '', additionalMedia: [] as string[], genre: [] as string[], sizes: [] as string[], rating: '4.5', volumes: '', status: 'completed',
     featured: false, isNew: false, section: 'all',
     publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '',
   });
@@ -365,6 +365,15 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
   const handleTitleChange = (value: string) => setForm(prev => ({ ...prev, title: value, id: generateId(value) }));
   const toggleGenre = (genre: string) => setForm(prev => ({ ...prev, genre: prev.genre.includes(genre) ? prev.genre.filter(g => g !== genre) : [...prev.genre, genre] }));
   const toggleSize = (size: string) => setForm(prev => ({ ...prev, sizes: prev.sizes.includes(size) ? prev.sizes.filter(s => s !== size) : [...prev.sizes, size] }));
+
+  const addMediaUrl = (url: string) => {
+    if (url && !form.additionalMedia.includes(url)) {
+      setForm(prev => ({ ...prev, additionalMedia: [...prev.additionalMedia, url] }));
+    }
+  };
+  const removeMediaUrl = (index: number) => {
+    setForm(prev => ({ ...prev, additionalMedia: prev.additionalMedia.filter((_, i) => i !== index) }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -380,11 +389,11 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
         volumes: parseInt(form.volumes) || 1, status: form.status,
         featured: form.featured || form.section === 'featured',
         is_new: form.isNew || form.section === 'new',
-        product_info: { productType: 'Books', sizes: form.sizes, publisher: form.publisher || '-', material: form.material, usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' } as any,
+        product_info: { productType: 'Books', sizes: form.sizes, media: form.additionalMedia, publisher: form.publisher || '-', material: form.material, usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' } as any,
       });
       setSuccess(`"${form.title}" added!`);
       await refreshProducts(); await loadCustomProducts();
-      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', genre: [], sizes: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '' });
+      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', additionalMedia: [], genre: [], sizes: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
   };
 
@@ -401,7 +410,38 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
           </div>
           <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Brand *</label><input type="text" value={form.author} onChange={e => setForm(prev => ({ ...prev, author: e.target.value }))} required className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
           <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Description</label><textarea value={form.description} onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))} rows={3} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none resize-none" /></div>
-          <ImageUpload value={form.image} onChange={url => setForm(prev => ({ ...prev, image: url }))} />
+
+          <div>
+            <label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Main Product Image</label>
+            <ImageUpload value={form.image} onChange={url => setForm(prev => ({ ...prev, image: url }))} />
+          </div>
+
+          <div>
+            <label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Additional Media (Images / Video URLs)</label>
+            <div className="space-y-3">
+              {form.additionalMedia.map((url, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input type="text" value={url} disabled className="w-full px-4 py-2 text-sm border border-[var(--mist)] rounded bg-[var(--paper-warm)] text-[var(--ink)] opacity-70" />
+                  <button type="button" onClick={() => removeMediaUrl(i)} className="px-3 py-2 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50">Remove</button>
+                </div>
+              ))}
+              <div className="flex items-center gap-2">
+                <input type="text" id="new-media-url" placeholder="Paste image or .mp4 URL here" className="w-full px-4 py-2 text-sm border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addMediaUrl(e.currentTarget.value);
+                    e.currentTarget.value = '';
+                  }
+                }} />
+                <button type="button" onClick={() => {
+                  const input = document.getElementById('new-media-url') as HTMLInputElement;
+                  addMediaUrl(input.value);
+                  input.value = '';
+                }} className="px-4 py-2 text-sm bg-[var(--stone)] text-white rounded hover:bg-[var(--ink)] whitespace-nowrap">Add URL</button>
+              </div>
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-4">
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Price (INR) *</label><input type="number" value={form.price} onChange={e => setForm(prev => ({ ...prev, price: e.target.value }))} required min="1" className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Original Price</label><input type="number" value={form.originalPrice} onChange={e => setForm(prev => ({ ...prev, originalPrice: e.target.value }))} min="1" className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>

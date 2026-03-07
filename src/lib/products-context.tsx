@@ -172,6 +172,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
             weight: row.product_info.weight || '-',
             dimensions: row.product_info.dimensions || '-',
             sizes: Array.isArray(productInfoObj.sizes) ? productInfoObj.sizes : [],
+            media: Array.isArray(productInfoObj.media) ? productInfoObj.media : [],
           };
         }
       }

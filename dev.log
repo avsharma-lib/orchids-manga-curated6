@@ -2,10 +2,13 @@
 > app@0.1.0 dev
 > next dev --turbopack
 
- ⚠ Port 3000 is in use by an unknown process, using available port 3009 instead.
-   ▲ Next.js 15.5.7 (Turbopack)
-   - Local:        http://localhost:3009
-   - Network:      http://192.168.0.2:3009
-
- ✓ Starting...
- ✓ Ready in 1498ms
+ ⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3010
+    at <unknown> (Error: listen EADDRINUSE: address already in use :::3010) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3010
+}
+[?25h

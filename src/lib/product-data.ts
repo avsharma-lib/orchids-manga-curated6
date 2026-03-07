@@ -24,6 +24,7 @@ export interface ProductInfo {
   weight: string;
   dimensions: string;
   sizes?: string[];
+  media?: string[];
 }
 
 export interface TShirt {

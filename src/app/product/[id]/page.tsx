@@ -20,6 +20,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const productInfo = getProductInfo(id);
   const tShirts = getTShirtsByProductId(id);
 
+  const allMedia = [product?.image, ...(productInfo?.media || [])].filter(Boolean);
+  const [activeMedia, setActiveMedia] = useState<string>(product?.image || '');
+
   // Stock selection state
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [sizeError, setSizeError] = useState('');
@@ -137,7 +140,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   // Get related Product (same genre, excluding current)
   const relatedProducts = allProducts
-    .filter(p => p.id !== product.id && p.genre.some(g => product.genre.includes(g)))
+    .filter(p => p.id !== product.id && (p.genre || []).some(g => (product.genre || []).includes(g)))
     .slice(0, 4);
 
   return (
@@ -157,7 +160,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       <section className="pb-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
-            {/* Image */}
+            {/* Image & Media Gallery */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -172,9 +175,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         {product.title}
                       </span>
                     </div>
+                  ) : activeMedia?.endsWith('.mp4') || activeMedia?.endsWith('.webm') ? (
+                    <video
+                      src={activeMedia}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                      onError={() => setImgError(true)}
+                    />
                   ) : (
                     <Image
-                      src={product.image}
+                      src={activeMedia || product.image}
                       alt={product.title}
                       fill
                       className="object-cover"
@@ -185,8 +198,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     />
                   )}
                 </div>
+
+                {/* Media Thumbnails */}
+                {allMedia.length > 1 && (
+                  <div className="flex gap-3 mt-4 overflow-x-auto pb-2 justify-center max-w-lg mx-auto no-scrollbar">
+                    {allMedia.map((mediaUrl, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveMedia(mediaUrl)}
+                        className={`relative w-20 h-24 shrink-0 rounded overflow-hidden border-2 transition-colors ${
+                          activeMedia === mediaUrl ? 'border-[var(--ink)]' : 'border-transparent opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        {mediaUrl.endsWith('.mp4') || mediaUrl.endsWith('.webm') ? (
+                          <video src={mediaUrl} className="w-full h-full object-cover pointer-events-none" />
+                        ) : (
+                          <Image src={mediaUrl} alt={`${product.title} view ${idx + 1}`} fill className="object-cover" unoptimized />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {/* Badges */}
-                <div className="absolute top-4 left-4 flex flex-col gap-2">
+                <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
                   {product.new && (
                     <span className="px-3 py-1.5 text-xs tracking-widest uppercase bg-[var(--crimson)] text-white">
                       New
@@ -386,7 +421,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Genre</span>
-                  <span className="text-[var(--ink)]">{product.genre.join(', ')}</span>
+                  <span className="text-[var(--ink)]">{(product.genre || []).join(', ')}</span>
                 </div>
               </div>
 
@@ -460,22 +495,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     {sizeError && <span className="text-xs text-[var(--crimson)]">{sizeError}</span>}
                   </div>
                   <div className="flex flex-wrap gap-3">
-                    {productInfo.sizes.map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => {
-                          setSelectedSize(size);
-                          setSizeError('');
-                        }}
-                        className={`w-12 h-12 flex items-center justify-center border text-sm transition-colors ${
-                          selectedSize === size
-                            ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
-                            : 'border-[var(--mist)] text-[var(--stone)] hover:border-[var(--ink)]'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                    {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'OS'].map((size) => {
+                      const isAvailable = productInfo.sizes?.includes(size);
+                      return (
+                        <button
+                          key={size}
+                          onClick={() => {
+                            if (isAvailable) {
+                              setSelectedSize(size);
+                              setSizeError('');
+                            }
+                          }}
+                          disabled={!isAvailable}
+                          className={`w-12 h-12 flex items-center justify-center border text-sm transition-colors ${
+                            !isAvailable
+                              ? 'border-[var(--mist)] text-[var(--mist)] cursor-not-allowed line-through opacity-50'
+                              : selectedSize === size
+                              ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
+                              : 'border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--ink)] hover:text-[var(--paper)]'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

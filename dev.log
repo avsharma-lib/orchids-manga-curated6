@@ -1,0 +1,11 @@
+
+> app@0.1.0 dev
+> next dev --turbopack
+
+ ⚠ Port 3000 is in use by an unknown process, using available port 3007 instead.
+   ▲ Next.js 15.5.7 (Turbopack)
+   - Local:        http://localhost:3007
+   - Network:      http://192.168.0.2:3007
+
+ ✓ Starting...
+ ✓ Ready in 1733ms

@@ -24,7 +24,7 @@ export default function AccessoriesPage() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
               {allAccessories.map((accessory, index) => (
                 <motion.div key={accessory.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: 0.3 }}>
-                  <Link href={`/accessorys/${accessory.id}`} className="group block">
+                  <Link href={`/accessories/${accessory.id}`} className="group block">
                     <div className="relative aspect-[3/2] bg-[var(--mist)] overflow-hidden rounded-lg mb-4">
                       <Image src={accessory.image} alt={accessory.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
                       <div className="absolute top-2 left-2"><span className="px-2 py-1 text-[10px] tracking-widest uppercase bg-[var(--crimson)] text-white rounded">Accessory</span></div>

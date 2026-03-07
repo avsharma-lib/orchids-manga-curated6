@@ -7,7 +7,7 @@ import { useProducts } from '@/lib/products-context';
 
 export default function BoxSetsPage() {
   const { allProducts, allTShirts } = useProducts();
-  const availableBoxSets = allTShirts?.filter(ts => allProducts?.some(m => m.id === ts.productId) || !ts.productId);
+  const availableTShirts = allTShirts?.filter(ts => allProducts?.some(m => m.id === ts.productId) || !ts.productId);
 
   return (
     <div className="bg-[var(--paper)] pt-20 min-h-screen">
@@ -17,25 +17,25 @@ export default function BoxSetsPage() {
             <Link href="/" className="hover:text-[var(--ink)]">Home</Link><span>/</span><span className="text-[var(--ink)]">T-Shirts</span>
           </nav>
           <h1 className="text-4xl md:text-5xl text-[var(--ink)]" style={{ fontFamily: 'var(--font-heading)' }}>All T-Shirts</h1>
-          <p className="mt-4 text-[var(--stone)]">{availableBoxSets.length} collections available</p>
+          <p className="mt-4 text-[var(--stone)]">{availableTShirts.length} collections available</p>
         </div>
       </section>
       <section className="py-12">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-            {availableBoxSets.map((boxSet, index) => (
-              <motion.div key={boxSet.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: 0.3 }}>
-                <Link href={`/t-shirt/${boxSet.id}`} className="group block">
+            {availableTShirts.map((tShirt, index) => (
+              <motion.div key={tShirt.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: 0.3 }}>
+                <Link href={`/t-shirt/${tShirt.id}`} className="group block">
                   <div className="relative aspect-[4/3] bg-[var(--mist)] overflow-hidden rounded-lg mb-4">
-                    <Image src={boxSet.image} alt={boxSet.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
+                    <Image src={tShirt.image} alt={tShirt.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
                     <div className="absolute top-2 left-2"><span className="px-2 py-1 text-[10px] tracking-widest uppercase bg-[var(--crimson)] text-white rounded">t-shirt</span></div>
                   </div>
-                  <h3 className="text-sm font-medium text-[var(--ink)] mb-1 group-hover:text-[var(--crimson)] transition-colors line-clamp-2">{boxSet.title}</h3>
-                  <p className="text-xs text-[var(--stone)] mb-2">{boxSet.volumesIncluded}</p>
+                  <h3 className="text-sm font-medium text-[var(--ink)] mb-1 group-hover:text-[var(--crimson)] transition-colors line-clamp-2">{tShirt.title}</h3>
+                  <p className="text-xs text-[var(--stone)] mb-2">{tShirt.sizesAvailable}</p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-medium text-[var(--ink)]">{formatPrice(boxSet.price)}</span>
-                    <span className="text-xs text-[var(--stone)] line-through">{formatPrice(boxSet.originalPrice)}</span>
-                    <span className="text-xs text-[var(--crimson)]">-{Math.round((1 - boxSet.price / boxSet.originalPrice) * 100)}%</span>
+                    <span className="text-sm font-medium text-[var(--ink)]">{formatPrice(tShirt.price)}</span>
+                    <span className="text-xs text-[var(--stone)] line-through">{formatPrice(tShirt.originalPrice)}</span>
+                    <span className="text-xs text-[var(--crimson)]">-{Math.round((1 - tShirt.price / tShirt.originalPrice) * 100)}%</span>
                   </div>
                 </Link>
               </motion.div>

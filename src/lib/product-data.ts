@@ -45,24 +45,24 @@ export const clothingProductInfo: Record<string, ProductInfo> = {};
 // Box sets data - only for manga that have official box sets
 export const tShirtsData: TShirt[] = [];
 
-export const getBoxSetByMangaId = (productId: string): BoxSet | undefined => {
-  return boxSetsData.find(b => b.productId === productId);
+export const getTShirtByProductId = (productId: string): TShirt | undefined => {
+  return tShirtsData.find(b => b.productId === productId);
 };
 
-export const getBoxSetsByMangaId = (productId: string): BoxSet[] => {
-  return boxSetsData.filter(b => b.productId === productId);
+export const getTShirtsByProductId = (productId: string): TShirt[] => {
+  return tShirtsData.filter(b => b.productId === productId);
 };
 
-export const getBoxSetById = (id: string): BoxSet | undefined => {
-  return boxSetsData.find(b => b.id === id);
+export const getTShirtById = (id: string): TShirt | undefined => {
+  return tShirtsData.find(b => b.id === id);
 };
 
 export const getProductInfo = (id: string): ProductInfo => {
-  const manga = getMangaById(id);
+  const manga = getProductById(id);
   return clothingProductInfo[id] || {
     productType: 'Books',
     publisher: '-',
-    stock: manga?.volumes || 0,
+    stock: manga?.stock || 0,
     material: 'Paper',
     usage: 'Reading',
     isbn: '-',

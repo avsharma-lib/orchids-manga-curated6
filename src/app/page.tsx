@@ -15,10 +15,10 @@ export default function HomePage() {
   const newProduct = getNewProduct();
   const darkFantasyProduct = allProducts?.filter(m => m.genre.includes('Streetwear')).slice(0, 4);
   const horrorProduct = allProducts?.filter(m => m.genre.includes('Casual')).slice(0, 4);
-  const availableBoxSets = allTShirts?.filter(bs =>
+  const availableTShirts = allTShirts?.filter(bs =>
     allProducts?.some(p => p.id === bs.productId) || !bs.productId
   );
-  const displayedBoxSets = availableBoxSets?.slice(0, Math.ceil(availableBoxSets.length / 2));
+  const displayedTShirts = availableTShirts?.slice(0, Math.ceil(availableTShirts.length / 2));
 
   return (
     <div className="bg-[var(--paper)]">
@@ -131,7 +131,7 @@ export default function HomePage() {
       </section>
 
       {/* T-Shirts - limited with View All */}
-      {availableBoxSets.length > 0 && (
+      {availableTShirts.length > 0 && (
         <section id="t-shirts" className="py-12 lg:py-16 bg-[var(--ink)] text-[var(--paper)]">
           <div className="mx-auto max-w-7xl px-6 lg:px-12">
             <div className="flex items-end justify-between mb-8">
@@ -141,19 +141,19 @@ export default function HomePage() {
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-              {displayedBoxSets?.map((boxSet, index) => (
-                <motion.div key={boxSet.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.03, duration: 0.3 }}>
-                  <Link href={`/box-set/${boxSet.id}`} className="group block">
+              {displayedTShirts?.map((tShirt, index) => (
+                <motion.div key={tShirt.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.03, duration: 0.3 }}>
+                  <Link href={`/box-set/${tShirt.id}`} className="group block">
                     <div className="relative aspect-[4/3] bg-[var(--charcoal)] overflow-hidden rounded-lg mb-4">
-                      <Image src={boxSet.image} alt={boxSet.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
+                      <Image src={tShirt.image} alt={tShirt.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
                       <div className="absolute top-2 left-2"><span className="px-2 py-1 text-[10px] tracking-widest uppercase bg-[var(--crimson)] text-white rounded">T-Shirt</span></div>
                     </div>
-                    <h3 className="text-sm font-medium text-[var(--paper)] mb-1 group-hover:text-[var(--crimson-muted)] transition-colors line-clamp-2">{boxSet.title}</h3>
-                    <p className="text-xs text-[var(--mist)] mb-2">{boxSet.volumesIncluded}</p>
+                    <h3 className="text-sm font-medium text-[var(--paper)] mb-1 group-hover:text-[var(--crimson-muted)] transition-colors line-clamp-2">{tShirt.title}</h3>
+                    <p className="text-xs text-[var(--mist)] mb-2">{tShirt.sizesAvailable}</p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-medium text-[var(--paper)]">{formatPrice(boxSet.price)}</span>
-                      <span className="text-xs text-[var(--stone)] line-through">{formatPrice(boxSet.originalPrice)}</span>
-                      <span className="text-xs text-[var(--crimson-muted)]">-{Math.round((1 - boxSet.price / boxSet.originalPrice) * 100)}%</span>
+                      <span className="text-sm font-medium text-[var(--paper)]">{formatPrice(tShirt.price)}</span>
+                      <span className="text-xs text-[var(--stone)] line-through">{formatPrice(tShirt.originalPrice)}</span>
+                      <span className="text-xs text-[var(--crimson-muted)]">-{Math.round((1 - tShirt.price / tShirt.originalPrice) * 100)}%</span>
                     </div>
                   </Link>
                 </motion.div>
@@ -187,18 +187,18 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-              {allHoodies?.slice(0, 8)?.map((figure, index) => (
-                <motion.div key={figure.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.03, duration: 0.3 }}>
-                  <Link href={`/hoodies/${figure.id}`} className="group block">
+              {allHoodies?.slice(0, 8)?.map((hoodie, index) => (
+                <motion.div key={hoodie.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.03, duration: 0.3 }}>
+                  <Link href={`/hoodies/${hoodie.id}`} className="group block">
                     <div className="relative aspect-square bg-[var(--mist)] overflow-hidden rounded-lg mb-4">
-                      <Image src={figure.image} alt={figure.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
+                      <Image src={hoodie.image} alt={hoodie.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
                       <div className="absolute top-2 left-2"><span className="px-2 py-1 text-[10px] tracking-widest uppercase bg-[var(--ink)] text-white rounded">Hoodie</span></div>
                     </div>
-                    <h3 className="text-sm font-medium text-[var(--ink)] mb-1 group-hover:text-[var(--crimson)] transition-colors line-clamp-2">{figure.title}</h3>
-                    {figure.series && <p className="text-xs text-[var(--stone)] mb-2">{figure.series}</p>}
+                    <h3 className="text-sm font-medium text-[var(--ink)] mb-1 group-hover:text-[var(--crimson)] transition-colors line-clamp-2">{hoodie.title}</h3>
+                    {hoodie.series && <p className="text-xs text-[var(--stone)] mb-2">{hoodie.series}</p>}
                     <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-medium text-[var(--ink)]">{formatPrice(figure.price)}</span>
-                      <span className="text-xs text-[var(--stone)] line-through">{formatPrice(figure.originalPrice)}</span>
+                      <span className="text-sm font-medium text-[var(--ink)]">{formatPrice(hoodie.price)}</span>
+                      <span className="text-xs text-[var(--stone)] line-through">{formatPrice(hoodie.originalPrice)}</span>
                     </div>
                   </Link>
                 </motion.div>
@@ -232,18 +232,18 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-              {allAccessories?.slice(0, 8)?.map((katana, index) => (
-                <motion.div key={katana.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.03, duration: 0.3 }}>
-                  <Link href={`/accessories/${katana.id}`} className="group block">
+              {allAccessories?.slice(0, 8)?.map((accessory, index) => (
+                <motion.div key={accessory.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.03, duration: 0.3 }}>
+                  <Link href={`/accessories/${accessory.id}`} className="group block">
                     <div className="relative aspect-[3/2] bg-[var(--charcoal)] overflow-hidden rounded-lg mb-4">
-                      <Image src={katana.image} alt={katana.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
+                      <Image src={accessory.image} alt={accessory.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" unoptimized />
                       <div className="absolute top-2 left-2"><span className="px-2 py-1 text-[10px] tracking-widest uppercase bg-[var(--crimson)] text-white rounded">Accessory</span></div>
                     </div>
-                    <h3 className="text-sm font-medium text-[var(--paper)] mb-1 group-hover:text-[var(--crimson-muted)] transition-colors line-clamp-2">{katana.title}</h3>
-                    {katana.series && <p className="text-xs text-[var(--mist)] mb-2">{katana.series}</p>}
+                    <h3 className="text-sm font-medium text-[var(--paper)] mb-1 group-hover:text-[var(--crimson-muted)] transition-colors line-clamp-2">{accessory.title}</h3>
+                    {accessory.series && <p className="text-xs text-[var(--mist)] mb-2">{accessory.series}</p>}
                     <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-medium text-[var(--paper)]">{formatPrice(katana.price)}</span>
-                      <span className="text-xs text-[var(--stone)] line-through">{formatPrice(katana.originalPrice)}</span>
+                      <span className="text-sm font-medium text-[var(--paper)]">{formatPrice(accessory.price)}</span>
+                      <span className="text-xs text-[var(--stone)] line-through">{formatPrice(accessory.originalPrice)}</span>
                     </div>
                   </Link>
                 </motion.div>

@@ -43,7 +43,7 @@ export interface Accessory {
 }
 
 interface ProductsContextType {
-  allProduct: Product[];
+  allProducts: Product[];
   allTShirts: TShirt[];
   allHoodies: Hoodie[];
   allAccessories: Accessory[];
@@ -75,7 +75,7 @@ function convertCustomProduct(row: CustomMangaRow): Product {
     image: row.image,
     genre: row.genre || [],
     rating: row.rating,
-    stock: row.stock,
+    stock: row.volumes,
     status: row.status as 'ongoing' | 'completed',
     featured: row.featured,
     new: row.is_new,
@@ -91,7 +91,7 @@ function convertCustomTShirt(row: CustomBoxSetRow): TShirt {
     image: row.image,
     price: row.price,
     originalPrice: row.original_price,
-    sizesAvailable: row.stock_included,
+    sizesAvailable: row.volumes_included,
     publisher: row.publisher,
     weight: row.weight,
     dimensions: row.dimensions,
@@ -165,7 +165,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
           info[row.id] = {
             productType: row.product_info.productType || 'Books',
             publisher: row.product_info.publisher || '-',
-            stock: row.stock,
+            stock: row.volumes,
             material: row.product_info.material || 'Paper',
             usage: row.product_info.usage || 'Reading',
             isbn: row.product_info.isbn || '-',
@@ -186,14 +186,14 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     refreshProducts();
   }, [refreshProducts]);
 
-  const allProduct = [...productCollection, ...customProduct];
+  const allProducts = [...productCollection, ...customProduct];
   const allTShirts = [...tShirtsData, ...customTShirts];
   const allProductInfo = { ...clothingProductInfo, ...customProductInfo };
   const allGenres = Array.from(
     new Set([...staticGenres, ...customProduct.flatMap(m => m.genre)])
   ).sort();
 
-  const getProductByIdFn = (id: string) => allProduct.find(m => m.id === id);
+  const getProductByIdFn = (id: string) => allProducts.find(m => m.id === id);
   const getTShirtByIdFn = (id: string) => allTShirts.find(b => b.id === id);
   const getTShirtsByProductIdFn = (productId: string) => allTShirts.filter(b => b.productId === productId);
   const getProductInfoFn = (id: string): ProductInfo => {
@@ -209,16 +209,16 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       dimensions: '-',
     };
   };
-  const getFeaturedProductFn = () => allProduct.filter(m => m.featured);
-  const getNewProductFn = () => allProduct.filter(m => m.new);
-  const getProductByGenreFn = (genre: string) => allProduct.filter(m => m.genre.includes(genre));
+  const getFeaturedProductFn = () => allProducts.filter(m => m.featured);
+  const getNewProductFn = () => allProducts.filter(m => m.new);
+  const getProductByGenreFn = (genre: string) => allProducts.filter(m => m.genre.includes(genre));
   const getHoodieByIdFn = (id: string) => hoodies.find(f => f.id === id);
   const getAccessoryByIdFn = (id: string) => accessories.find(k => k.id === id);
 
   return (
     <ProductsContext.Provider
       value={{
-        allProduct,
+        allProducts,
         allTShirts,
         allHoodies: hoodies,
         allAccessories: accessories,

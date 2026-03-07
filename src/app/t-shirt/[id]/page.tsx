@@ -11,7 +11,7 @@ import { useCart } from '@/lib/cart-context';
 
 export default function BoxSetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getTShirtById, getProductById, allBoxSets } = useProducts();
+  const { getTShirtById, getProductById, allTShirts } = useProducts();
   const tShirt = getTShirtById(id);
   const router = useRouter();
   const { addToCart } = useCart();
@@ -34,18 +34,32 @@ export default function BoxSetDetailPage({ params }: { params: Promise<{ id: str
       image: tShirt.image,
       genre: relatedManga?.genre || ['Manga'],
       rating: relatedManga?.rating || 4.5,
-      volumes: 1,
+      stock: 1,
       status: 'completed',
     });
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
-    router.push('/checkout');
+    const item = {
+      id: tShirt.id,
+      title: tShirt.title,
+      author: relatedManga?.author || 'Various',
+      description: tShirt.description,
+      price: tShirt.price,
+      originalPrice: tShirt.originalPrice,
+      image: tShirt.image,
+      genre: relatedManga?.genre || ['Manga'],
+      rating: relatedManga?.rating || 4.5,
+      stock: 1,
+      status: 'completed' as const,
+    };
+    const buyNowItem = JSON.stringify({ product: item, quantity: 1 });
+    sessionStorage.setItem('buy-now-item', buyNowItem);
+    router.push('/checkout?mode=buynow');
   };
 
   // Get other T-Shirts for related section
-  const otherBoxSets = allBoxSets.filter(b => b.id !== tShirt.id).slice(0, 4);
+  const otherBoxSets = allTShirts.filter(b => b.id !== tShirt.id).slice(0, 4);
 
   return (
     <div className="bg-[var(--paper)] pt-20">

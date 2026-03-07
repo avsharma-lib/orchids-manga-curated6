@@ -512,6 +512,17 @@ CREATE TABLE IF NOT EXISTS custom_katanas (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Custom coupons table
+CREATE TABLE IF NOT EXISTS custom_coupons (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  code TEXT UNIQUE NOT NULL,
+  discount_percent INTEGER NOT NULL,
+  max_uses INTEGER,
+  uses INTEGER DEFAULT 0,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- Product images storage
 CREATE TABLE IF NOT EXISTS product_images (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,

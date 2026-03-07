@@ -19,13 +19,13 @@ export default function AccessoryDetailPage({ params }: { params: Promise<{ id: 
   if (!accessory) { notFound(); }
 
   const handleAddToCart = () => {
-    addToCart({ id: accessory.id, title: accessory.title, author: 'Accessory', description: accessory.description, price: accessory.price, originalPrice: accessory.originalPrice, image: accessory.image, genre: ['Accessory'], rating: 4.5, volumes: 1, status: 'completed' });
+    addToCart({ id: accessory.id, title: accessory.title, author: 'Accessory', description: accessory.description, price: accessory.price, originalPrice: accessory.originalPrice, image: accessory.image, genre: ['Accessory'], rating: 4.5, stock: 1, status: 'completed' });
   };
 
   const handleBuyNow = () => {
-    const item = { id: accessory.id, title: accessory.title, author: 'Accessory', description: accessory.description, price: accessory.price, originalPrice: accessory.originalPrice, image: accessory.image, genre: ['Accessory'] as string[], rating: 4.5, volumes: 1, status: 'completed' as const };
-    const buyNowItems = JSON.stringify([{ product: item, quantity: 1 }]);
-    sessionStorage.setItem('buy-now-items', buyNowItems);
+    const item = { id: accessory.id, title: accessory.title, author: 'Accessory', description: accessory.description, price: accessory.price, originalPrice: accessory.originalPrice, image: accessory.image, genre: ['Accessory'] as string[], rating: 4.5, stock: 1, status: 'completed' as const };
+    const buyNowItem = JSON.stringify({ product: item, quantity: 1 });
+    sessionStorage.setItem('buy-now-item', buyNowItem);
     router.push('/checkout?mode=buynow');
   };
 

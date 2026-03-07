@@ -19,13 +19,13 @@ export default function ActionFigureDetailPage({ params }: { params: Promise<{ i
   if (!figure) { notFound(); }
 
   const handleAddToCart = () => {
-    addToCart({ id: hoodie.id, title: hoodie.title, author: hoodie.brand || 'Hoodie', description: hoodie.description, price: hoodie.price, originalPrice: hoodie.originalPrice, image: hoodie.image, genre: ['Hoodie'], rating: 4.5, volumes: 1, status: 'completed' });
+    addToCart({ id: hoodie.id, title: hoodie.title, author: hoodie.brand || 'Hoodie', description: hoodie.description, price: hoodie.price, originalPrice: hoodie.originalPrice, image: hoodie.image, genre: ['Hoodie'], rating: 4.5, stock: 1, status: 'completed' });
   };
 
   const handleBuyNow = () => {
-    const item = { id: hoodie.id, title: hoodie.title, author: hoodie.brand || 'Hoodie', description: hoodie.description, price: hoodie.price, originalPrice: hoodie.originalPrice, image: hoodie.image, genre: ['Hoodie'] as string[], rating: 4.5, volumes: 1, status: 'completed' as const };
-    const buyNowItems = JSON.stringify([{ product: item, quantity: 1 }]);
-    sessionStorage.setItem('buy-now-items', buyNowItems);
+    const item = { id: hoodie.id, title: hoodie.title, author: hoodie.brand || 'Hoodie', description: hoodie.description, price: hoodie.price, originalPrice: hoodie.originalPrice, image: hoodie.image, genre: ['Hoodie'] as string[], rating: 4.5, stock: 1, status: 'completed' as const };
+    const buyNowItem = JSON.stringify({ product: item, quantity: 1 });
+    sessionStorage.setItem('buy-now-item', buyNowItem);
     router.push('/checkout?mode=buynow');
   };
 

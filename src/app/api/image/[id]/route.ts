@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   const base64 = image.image_data;
-  const buffer = Buffer.from(base64, 'base64');
+  const buffer = Buffer.from(base64.replace(/^data:image\/[a-z]+;base64,/, ''), 'base64');
   
   return new NextResponse(buffer, {
     headers: {

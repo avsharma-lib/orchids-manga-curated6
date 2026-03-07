@@ -196,12 +196,12 @@ useEffect(() => {
     try {
       const fullAddress = [formData.addressLine1, formData.addressLine2, formData.city, formData.state, formData.pincode].filter(Boolean).join(', ');
       const orderItems = items.map(item => ({
-        mangaId: item.manga.id,
-        title: item.manga.title,
-        author: item.manga.author || '',
-        price: item.manga.price,
+        mangaId: item.product.id,
+        title: item.product.title,
+        author: item.product.author || '',
+        price: item.product.price,
         quantity: item.quantity,
-        image: item.manga.image,
+        image: item.product.image,
       }));
       await createOrder({
         device_id: getDeviceId(),
@@ -399,16 +399,16 @@ useEffect(() => {
                 <h2 className="text-2xl text-[var(--ink)] mb-6" style={{ fontFamily: 'var(--font-heading)' }}>Order Summary</h2>
                 <div className="space-y-4 pb-6 border-b border-[var(--mist)] max-h-80 overflow-y-auto">
                   {items.map(item => (
-                    <div key={item.manga.id} className="flex gap-4">
+                    <div key={item.product.id} className="flex gap-4">
                       <div className="relative w-16 h-24 bg-[var(--mist)] overflow-hidden shrink-0">
-                        <Image src={item.manga.image} alt={item.manga.title} fill className="object-cover" sizes="64px" unoptimized />
+                        <Image src={item.product.image} alt={item.product.title} fill className="object-cover" sizes="64px" unoptimized />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-medium text-[var(--ink)] truncate">{item.manga.title}</h3>
-                        <p className="text-xs text-[var(--stone)]">{item.manga.author}</p>
+                        <h3 className="text-sm font-medium text-[var(--ink)] truncate">{item.product.title}</h3>
+                        <p className="text-xs text-[var(--stone)]">{item.product.author}</p>
                         <div className="flex justify-between mt-2">
                           <span className="text-xs text-[var(--stone)]">Qty: {item.quantity}</span>
-                          <span className="text-sm text-[var(--ink)]">{formatPrice(item.manga.price * item.quantity)}</span>
+                          <span className="text-sm text-[var(--ink)]">{formatPrice(item.product.price * item.quantity)}</span>
                         </div>
                       </div>
                     </div>

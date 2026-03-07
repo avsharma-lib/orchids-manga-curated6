@@ -26,11 +26,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [multipleVolumeCount, setMultipleVolumeCount] = useState('1');
   const [volumeError, setVolumeError] = useState('');
 
-  if (!Product) {
+  if (!product) {
     notFound();
   }
 
-  const maxStock = product.volumes;
+  const maxStock = product.stock;
 
   // Calculate price based on selection
   const calculatePrice = () => {
@@ -77,7 +77,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       if (!validateSingleVolume(singleVolumeNumber)) return;
       const volumeNum = parseInt(singleVolumeNumber);
       addToCart({
-        ...Product,
+        ...product,
         id: `${product.id}-vol-${volumeNum}`,
         title: `${product.title} - Stock ${volumeNum}`,
         price: product.price,
@@ -86,7 +86,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       if (!validateMultipleStock(multipleVolumeCount)) return;
       const count = parseInt(multipleVolumeCount);
       addToCart({
-        ...Product,
+        ...product,
         id: `${product.id}-vols-1-${count}`,
         title: `${product.title} - Stock 1-${count}`,
         price: calculatePrice(),
@@ -100,14 +100,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         if (!validateSingleVolume(singleVolumeNumber)) return;
         const volumeNum = parseInt(singleVolumeNumber);
         buyItem = {
-          product: { ...Product, id: `${product.id}-vol-${volumeNum}`, title: `${product.title} - Stock ${volumeNum}`, price: product.price },
+          product: { ...product, id: `${product.id}-vol-${volumeNum}`, title: `${product.title} - Stock ${volumeNum}`, price: product.price },
           quantity: 1,
         };
       } else {
         if (!validateMultipleStock(multipleVolumeCount)) return;
         const count = parseInt(multipleVolumeCount);
         buyItem = {
-          product: { ...Product, id: `${product.id}-vols-1-${count}`, title: `${product.title} - Stock 1-${count}`, price: calculatePrice() },
+          product: { ...product, id: `${product.id}-vols-1-${count}`, title: `${product.title} - Stock 1-${count}`, price: calculatePrice() },
           quantity: 1,
         };
       }
@@ -117,7 +117,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   // Get related Product (same genre, excluding current)
   const relatedProducts = allProducts
-    .filter(m => m.id !== product.id && p.genre.some(g => product.genre.includes(g)))
+    .filter(p => p.id !== product.id && p.genre.some(g => product.genre.includes(g)))
     .slice(0, 4);
 
   return (
@@ -358,7 +358,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <div className="border-t border-b border-[var(--mist)] py-6 mb-8 space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Stock</span>
-                  <span className="text-[var(--ink)]">{product.volumes}</span>
+                  <span className="text-[var(--ink)]">{product.stock}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[var(--stone)]">Status</span>
@@ -399,17 +399,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 {boxSets.length > 0 && (
                   <div className="space-y-3 mt-4">
                     <p className="text-xs tracking-wider text-[var(--crimson)]">COMPLETE COLLECTIONS</p>
-                    {boxSets.map((boxSet) => (
+                    {tShirts.map((tShirt) => (
                       <Link
-                        key={boxSet.id}
-                        href={`/box-set/${boxSet.id}`}
+                        key={tShirt.id}
+                        href={`/t-shirt/${tShirt.id}`}
                         className="block w-full p-4 border-2 border-[var(--mist)] rounded-lg hover:border-[var(--ink)] transition-colors group"
                       >
                         <div className="flex items-center gap-4">
                           <div className="w-16 h-20 relative bg-[var(--mist)] rounded overflow-hidden shrink-0">
                             <Image
-                              src={boxSet.image}
-                              alt={boxSet.title}
+                              src={tShirt.image}
+                              alt={tShirt.title}
                               fill
                               className="object-cover"
                               sizes="64px"
@@ -418,10 +418,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                           </div>
                           <div className="flex-1">
                             <p className="text-sm font-medium text-[var(--ink)] group-hover:text-[var(--crimson)] transition-colors">
-                              {boxSet.title}
+                              {tShirt.title}
                             </p>
-                            <p className="text-xs text-[var(--stone)]">{boxSet.volumesIncluded}</p>
-                            <p className="text-sm font-medium text-[var(--ink)] mt-1">{formatPrice(boxSet.price)}</p>
+                            <p className="text-xs text-[var(--stone)]">{tShirt.sizesAvailable}</p>
+                            <p className="text-sm font-medium text-[var(--ink)] mt-1">{formatPrice(tShirt.price)}</p>
                           </div>
                           <svg className="w-5 h-5 text-[var(--stone)] group-hover:text-[var(--ink)] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -447,12 +447,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <span className="w-1/2 text-sm text-[var(--ink)]">{product.author}</span>
                   </div>
                   <div className="flex px-6 py-3">
-                    <span className="w-1/2 text-sm text-[var(--stone)]">Name of Publisher</span>
+                    <span className="w-1/2 text-sm text-[var(--stone)]">Care Instructions</span>
                     <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.publisher}</span>
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Stock</span>
-                    <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.volumes}</span>
+                    <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.stock}</span>
                   </div>
                   <div className="flex px-6 py-3">
                     <span className="w-1/2 text-sm text-[var(--stone)]">Material</span>
@@ -463,7 +463,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.usage}</span>
                   </div>
                   <div className="flex px-6 py-3">
-                    <span className="w-1/2 text-sm text-[var(--stone)]">ISBN</span>
+                    <span className="w-1/2 text-sm text-[var(--stone)]">SKU</span>
                     <span className="w-1/2 text-sm text-[var(--ink)]">{productInfo.isbn}</span>
                   </div>
                   <div className="flex px-6 py-3">
@@ -493,7 +493,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
               {relatedProducts.map((p, index) => (
-                <ProductCard key={p.id} Product={m} index={index} />
+                <ProductCard key={p.id} product={p} index={index} />
               ))}
             </div>
           </div>

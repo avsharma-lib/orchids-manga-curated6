@@ -21,6 +21,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const tShirts = getTShirtsByProductId(id);
 
   // Stock selection state
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [sizeError, setSizeError] = useState('');
+
   const [selectionMode, setSelectionMode] = useState<'single' | 'multiple'>('single');
   const [singleVolumeNumber, setSingleVolumeNumber] = useState('1');
   const [multipleVolumeCount, setMultipleVolumeCount] = useState('1');
@@ -73,47 +76,64 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   };
 
   const handleAddToCart = () => {
+    if (productInfo?.sizes && productInfo.sizes.length > 0 && !selectedSize) {
+      setSizeError('Please select a size first');
+      return;
+    }
+
     if (selectionMode === 'single') {
       if (!validateSingleVolume(singleVolumeNumber)) return;
       const volumeNum = parseInt(singleVolumeNumber);
+      const suffix = selectedSize ? `-size-${selectedSize}` : '';
+      const sizeTitle = selectedSize ? ` - Size ${selectedSize}` : '';
       addToCart({
         ...product,
-        id: `${product.id}-vol-${volumeNum}`,
-        title: `${product.title} - Stock ${volumeNum}`,
+        id: `${product.id}-vol-${volumeNum}${suffix}`,
+        title: `${product.title} - Stock ${volumeNum}${sizeTitle}`,
         price: product.price,
       });
     } else {
       if (!validateMultipleStock(multipleVolumeCount)) return;
       const count = parseInt(multipleVolumeCount);
+      const suffix = selectedSize ? `-size-${selectedSize}` : '';
+      const sizeTitle = selectedSize ? ` - Size ${selectedSize}` : '';
       addToCart({
         ...product,
-        id: `${product.id}-vols-1-${count}`,
-        title: `${product.title} - Stock 1-${count}`,
+        id: `${product.id}-vols-1-${count}${suffix}`,
+        title: `${product.title} - Stock 1-${count}${sizeTitle}`,
         price: calculatePrice(),
       });
     }
   };
 
-    const handleBuyNow = () => {
-      let buyItem;
-      if (selectionMode === 'single') {
-        if (!validateSingleVolume(singleVolumeNumber)) return;
-        const volumeNum = parseInt(singleVolumeNumber);
-        buyItem = {
-          product: { ...product, id: `${product.id}-vol-${volumeNum}`, title: `${product.title} - Stock ${volumeNum}`, price: product.price },
-          quantity: 1,
-        };
-      } else {
-        if (!validateMultipleStock(multipleVolumeCount)) return;
-        const count = parseInt(multipleVolumeCount);
-        buyItem = {
-          product: { ...product, id: `${product.id}-vols-1-${count}`, title: `${product.title} - Stock 1-${count}`, price: calculatePrice() },
-          quantity: 1,
-        };
-      }
-      sessionStorage.setItem('buy-now-item', JSON.stringify(buyItem));
-      router.push('/checkout?mode=buynow');
-    };
+  const handleBuyNow = () => {
+    if (productInfo?.sizes && productInfo.sizes.length > 0 && !selectedSize) {
+      setSizeError('Please select a size first');
+      return;
+    }
+
+    let buyItem;
+    const suffix = selectedSize ? `-size-${selectedSize}` : '';
+    const sizeTitle = selectedSize ? ` - Size ${selectedSize}` : '';
+
+    if (selectionMode === 'single') {
+      if (!validateSingleVolume(singleVolumeNumber)) return;
+      const volumeNum = parseInt(singleVolumeNumber);
+      buyItem = {
+        product: { ...product, id: `${product.id}-vol-${volumeNum}${suffix}`, title: `${product.title} - Stock ${volumeNum}${sizeTitle}`, price: product.price },
+        quantity: 1,
+      };
+    } else {
+      if (!validateMultipleStock(multipleVolumeCount)) return;
+      const count = parseInt(multipleVolumeCount);
+      buyItem = {
+        product: { ...product, id: `${product.id}-vols-1-${count}${suffix}`, title: `${product.title} - Stock 1-${count}${sizeTitle}`, price: calculatePrice() },
+        quantity: 1,
+      };
+    }
+    sessionStorage.setItem('buy-now-item', JSON.stringify(buyItem));
+    router.push('/checkout?mode=buynow');
+  };
 
   // Get related Product (same genre, excluding current)
   const relatedProducts = allProducts
@@ -431,6 +451,34 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     ))}
                   </div>
                 )}
+
+              {/* Size Selection */}
+              {productInfo?.sizes && productInfo.sizes.length > 0 && (
+                <div className="mt-8 pt-8 border-t border-[var(--mist)]">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-medium tracking-widest uppercase text-[var(--ink)]">Select Size</h3>
+                    {sizeError && <span className="text-xs text-[var(--crimson)]">{sizeError}</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {productInfo.sizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => {
+                          setSelectedSize(size);
+                          setSizeError('');
+                        }}
+                        className={`w-12 h-12 flex items-center justify-center border text-sm transition-colors ${
+                          selectedSize === size
+                            ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)]'
+                            : 'border-[var(--mist)] text-[var(--stone)] hover:border-[var(--ink)]'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Product Information Table */}
               <div className="mt-10 border border-[var(--mist)] rounded-lg overflow-hidden">

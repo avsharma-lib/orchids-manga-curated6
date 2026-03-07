@@ -356,7 +356,7 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     id: '', title: '', author: '', description: '', price: '', originalPrice: '',
-    image: '', genre: [] as string[], rating: '4.5', volumes: '', status: 'completed',
+    image: '', genre: [] as string[], sizes: [] as string[], rating: '4.5', volumes: '', status: 'completed',
     featured: false, isNew: false, section: 'all',
     publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '',
   });
@@ -364,6 +364,7 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
   const generateId = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const handleTitleChange = (value: string) => setForm(prev => ({ ...prev, title: value, id: generateId(value) }));
   const toggleGenre = (genre: string) => setForm(prev => ({ ...prev, genre: prev.genre.includes(genre) ? prev.genre.filter(g => g !== genre) : [...prev.genre, genre] }));
+  const toggleSize = (size: string) => setForm(prev => ({ ...prev, sizes: prev.sizes.includes(size) ? prev.sizes.filter(s => s !== size) : [...prev.sizes, size] }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -379,11 +380,11 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
         volumes: parseInt(form.volumes) || 1, status: form.status,
         featured: form.featured || form.section === 'featured',
         is_new: form.isNew || form.section === 'new',
-        product_info: { productType: 'Books', publisher: form.publisher || '-', material: form.material, usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' },
+        product_info: { productType: 'Books', sizes: form.sizes, publisher: form.publisher || '-', material: form.material, usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' } as any,
       });
       setSuccess(`"${form.title}" added!`);
       await refreshProducts(); await loadCustomProducts();
-      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', genre: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '' });
+      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', genre: [], sizes: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
   };
 
@@ -410,8 +411,16 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Rating</label><input type="number" value={form.rating} onChange={e => setForm(prev => ({ ...prev, rating: e.target.value }))} step="0.1" min="0" max="5" className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
             <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Status</label><select value={form.status} onChange={e => setForm(prev => ({ ...prev, status: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"><option value="completed">Completed</option><option value="ongoing">Ongoing</option></select></div>
           </div>
-          <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Genre</label><div className="flex flex-wrap gap-2">{staticGenres.map(genre => (<button key={genre} type="button" onClick={() => toggleGenre(genre)} className={`px-3 py-1.5 text-xs tracking-wider border rounded transition-colors ${form.genre.includes(genre) ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]' : 'border-[var(--mist)] text-[var(--stone)] hover:border-[var(--ink)]'}`}>{genre}</button>))}</div></div>
-          <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Section</label><div className="flex flex-wrap gap-3">{[['all','All'],['featured','Featured'],['new','New Arrivals']].map(([val,label]) => (<button key={val} type="button" onClick={() => setForm(prev => ({ ...prev, section: val, featured: val === 'featured', isNew: val === 'new' }))} className={`px-4 py-2 text-sm border rounded ${form.section === val ? 'bg-[var(--ink)] text-[var(--paper)]' : 'border-[var(--mist)] text-[var(--stone)]'}`}>{label}</button>))}</div></div>
+          <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Available Sizes</label><div className="flex flex-wrap gap-2">{['XS', 'S', 'M', 'L', 'XL', 'XXL', 'OS'].map(size => (<button key={size} type="button" onClick={() => toggleSize(size)} className={`px-3 py-1.5 text-xs font-bold tracking-wider border rounded transition-colors ${form.sizes.includes(size) ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]' : 'border-[var(--mist)] text-[var(--stone)] hover:border-[var(--ink)]'}`}>{size}</button>))}</div></div>
+          <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Category (Genre)</label><div className="flex flex-wrap gap-2">{staticGenres.map(genre => (<button key={genre} type="button" onClick={() => toggleGenre(genre)} className={`px-3 py-1.5 text-xs tracking-wider border rounded transition-colors ${form.genre.includes(genre) ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]' : 'border-[var(--mist)] text-[var(--stone)] hover:border-[var(--ink)]'}`}>{genre}</button>))}</div></div>
+          <div>
+            <label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Sections (Multiple allowed)</label>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" onClick={() => setForm(prev => ({ ...prev, featured: !prev.featured }))} className={`px-4 py-2 text-sm border rounded ${form.featured ? 'bg-[var(--ink)] text-[var(--paper)]' : 'border-[var(--mist)] text-[var(--stone)]'}`}>Featured</button>
+              <button type="button" onClick={() => setForm(prev => ({ ...prev, isNew: !prev.isNew }))} className={`px-4 py-2 text-sm border rounded ${form.isNew ? 'bg-[var(--ink)] text-[var(--paper)]' : 'border-[var(--mist)] text-[var(--stone)]'}`}>New Arrivals</button>
+              <button type="button" onClick={() => setForm(prev => ({ ...prev, featured: false, isNew: false }))} className={`px-4 py-2 text-sm border rounded ${!form.featured && !form.isNew ? 'bg-[var(--ink)] text-[var(--paper)]' : 'border-[var(--mist)] text-[var(--stone)]'}`}>Standard (Neither)</button>
+            </div>
+          </div>
           <div className="grid md:grid-cols-2 gap-4"><div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Care Instructions</label><input type="text" value={form.publisher} onChange={e => setForm(prev => ({ ...prev, publisher: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div><div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">SKU</label><input type="text" value={form.isbn} onChange={e => setForm(prev => ({ ...prev, isbn: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div></div>
           <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add Product'}</button>
         </form>

@@ -171,6 +171,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
             isbn: row.product_info.isbn || '-',
             weight: row.product_info.weight || '-',
             dimensions: row.product_info.dimensions || '-',
+            sizes: Array.isArray(productInfoObj.sizes) ? productInfoObj.sizes : [],
           };
         }
       }

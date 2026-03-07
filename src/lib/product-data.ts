@@ -23,6 +23,7 @@ export interface ProductInfo {
   isbn: string;
   weight: string;
   dimensions: string;
+  sizes?: string[];
 }
 
 export interface TShirt {

@@ -52,7 +52,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             : item
         );
       }
-      return [...prev, { manga, quantity: 1 }];
+      return [...prev, { product, quantity: 1 }];
     });
   };
 

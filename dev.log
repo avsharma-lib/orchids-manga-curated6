@@ -2,13 +2,14 @@
 > app@0.1.0 dev
 > next dev --turbopack
 
- ⨯ Failed to start server
-Error: listen EADDRINUSE: address already in use :::3010
-    at <unknown> (Error: listen EADDRINUSE: address already in use :::3010) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 3010
-}
-[?25h
+   ▲ Next.js 15.5.7 (Turbopack)
+   - Local:        http://localhost:3012
+   - Network:      http://192.168.0.2:3012
+
+ ✓ Starting...
+ ✓ Ready in 2s
+ ○ Compiling /shop ...
+ ✓ Compiled /shop in 9.7s
+ GET /shop 200 in 13257ms
+ GET /shop 200 in 405ms
+ GET /shop 200 in 298ms

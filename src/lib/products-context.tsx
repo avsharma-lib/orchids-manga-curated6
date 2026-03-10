@@ -163,11 +163,11 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
       for (const row of mangaRows) {
         if (row.product_info) {
           info[row.id] = {
-            productType: row.product_info.productType || 'Books',
+            productType: row.product_info.productType || 'Apparel',
             publisher: row.product_info.publisher || '-',
             stock: row.volumes,
-            material: row.product_info.material || 'Paper',
-            usage: row.product_info.usage || 'Reading',
+            material: row.product_info.material || 'Cotton',
+            usage: row.product_info.usage || 'Wear',
             isbn: row.product_info.isbn || '-',
             weight: row.product_info.weight || '-',
             dimensions: row.product_info.dimensions || '-',
@@ -201,11 +201,11 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   const getProductInfoFn = (id: string): ProductInfo => {
     const manga = getProductByIdFn(id);
     return allProductInfo[id] || {
-      productType: 'Books',
+      productType: 'Apparel',
       publisher: '-',
       stock: manga?.stock || 0,
-      material: 'Paper',
-      usage: 'Reading',
+      material: 'Cotton',
+      usage: 'Wear',
       isbn: '-',
       weight: '-',
       dimensions: '-',

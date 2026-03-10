@@ -62,11 +62,11 @@ export const getTShirtById = (id: string): TShirt | undefined => {
 export const getProductInfo = (id: string): ProductInfo => {
   const manga = getProductById(id);
   return clothingProductInfo[id] || {
-    productType: 'Books',
+    productType: 'Apparel',
     publisher: '-',
     stock: manga?.stock || 0,
-    material: 'Paper',
-    usage: 'Reading',
+    material: 'Cotton',
+    usage: 'Wear',
     isbn: '-',
     weight: '-',
     dimensions: '-'

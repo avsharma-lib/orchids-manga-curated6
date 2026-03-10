@@ -358,7 +358,7 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
     id: '', title: '', author: '', description: '', price: '', originalPrice: '',
     image: '', additionalMedia: [] as string[], genre: [] as string[], sizes: [] as string[], rating: '4.5', volumes: '', status: 'completed',
     featured: false, isNew: false, section: 'all',
-    publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '',
+    publisher: '', material: 'Cotton', usage: 'Wear', isbn: '', weight: '', dimensions: '',
   });
 
   const generateId = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -389,11 +389,11 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
         volumes: parseInt(form.volumes) || 1, status: form.status,
         featured: form.featured || form.section === 'featured',
         is_new: form.isNew || form.section === 'new',
-        product_info: { productType: 'Books', sizes: form.sizes, media: form.additionalMedia, publisher: form.publisher || '-', material: form.material, usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' } as any,
+        product_info: { productType: 'Apparel', sizes: form.sizes, media: form.additionalMedia, publisher: form.publisher || '-', material: form.material, usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' } as any,
       });
       setSuccess(`"${form.title}" added!`);
       await refreshProducts(); await loadCustomProducts();
-      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', additionalMedia: [], genre: [], sizes: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: '', material: 'Paper', usage: 'Reading', isbn: '', weight: '', dimensions: '' });
+      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', additionalMedia: [], genre: [], sizes: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: '', material: 'Cotton', usage: 'Wear', isbn: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
   };
 
@@ -527,7 +527,7 @@ function AddActionFigureTab({ refreshProducts, loadCustomProducts }: { refreshPr
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ title: '', description: '', price: '', originalPrice: '', image: '', brand: '', characterName: '', series: '', material: 'PVC', height: '', weight: '', dimensions: '' });
+  const [form, setForm] = useState({ title: '', description: '', price: '', originalPrice: '', image: '', brand: '', characterName: '', series: '', material: 'Cotton', height: '', weight: '', dimensions: '' });
   const generateId = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -539,7 +539,7 @@ function AddActionFigureTab({ refreshProducts, loadCustomProducts }: { refreshPr
       const originalPrice = parseInt(form.originalPrice) || price * 2;
       await addCustomActionFigure({ id: generateId(form.title), title: form.title, description: form.description || '', price: price, original_price: originalPrice, image: form.image || 'https://via.placeholder.com/400x600', brand: form.brand || '', character_name: form.characterName || '', series: form.series || '', material: form.material || '', height: form.height || '', weight: form.weight || '', dimensions: form.dimensions || '' });
       setSuccess(`"${form.title}" added!`); await refreshProducts(); await loadCustomProducts();
-      setForm({ title: '', description: '', price: '', originalPrice: '', image: '', brand: '', characterName: '', series: '', material: 'PVC', height: '', weight: '', dimensions: '' });
+      setForm({ title: '', description: '', price: '', originalPrice: '', image: '', brand: '', characterName: '', series: '', material: 'Cotton', height: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
   };
 

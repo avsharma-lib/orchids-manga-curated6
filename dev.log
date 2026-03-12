@@ -3,13 +3,11 @@
 > next dev --turbopack
 
    ▲ Next.js 15.5.7 (Turbopack)
-   - Local:        http://localhost:3012
-   - Network:      http://192.168.0.2:3012
+   - Local:        http://localhost:3020
+   - Network:      http://192.168.0.2:3020
 
  ✓ Starting...
- ✓ Ready in 2s
- ○ Compiling /shop ...
- ✓ Compiled /shop in 9.7s
- GET /shop 200 in 13257ms
- GET /shop 200 in 405ms
- GET /shop 200 in 298ms
+ ✓ Ready in 1688ms
+ ○ Compiling /admin ...
+ ✓ Compiled /admin in 15.1s
+ GET /admin 200 in 17111ms

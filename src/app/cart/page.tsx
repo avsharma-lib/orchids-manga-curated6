@@ -70,84 +70,88 @@ export default function CartPage() {
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-8">
-              {items.map((item, index) => (
-                <motion.div
-                  key={item.product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex gap-6 pb-8 border-b border-[var(--mist)]"
-                >
-                  {/* Image */}
-                  <Link href={`/product/${item.product.id}`} className="shrink-0">
-                    <div className="relative w-24 h-36 md:w-32 md:h-48 bg-[var(--mist)] overflow-hidden">
-                      <Image
-                        src={item.product.image}
-                        alt={item.product.title}
-                        fill
-                        className="object-cover"
-                        sizes="128px"
-                      />
-                    </div>
-                  </Link>
+              {items.map((item, index) => {
+                const product = item.product || item.manga;
+                if (!product) return null;
+                return (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex gap-6 pb-8 border-b border-[var(--mist)]"
+                  >
+                    {/* Image */}
+                    <Link href={`/product/${product.id}`} className="shrink-0">
+                      <div className="relative w-24 h-36 md:w-32 md:h-48 bg-[var(--mist)] overflow-hidden">
+                        <Image
+                          src={product.image}
+                          alt={product.title}
+                          fill
+                          className="object-cover"
+                          sizes="128px"
+                        />
+                      </div>
+                    </Link>
 
-                  {/* Details */}
-                  <div className="flex-1 flex flex-col">
-                    <div className="flex-1">
-                      <Link
-                        href={`/product/${item.product.id}`}
-                        className="text-lg text-[var(--ink)] hover:text-[var(--crimson)] transition-colors"
-                        style={{ fontFamily: 'var(--font-heading)' }}
-                      >
-                        {item.product.title}
-                      </Link>
-                      <p className="text-sm text-[var(--stone)] mt-1">
-                        {item.product.author}
-                      </p>
-                      <p className="text-sm text-[var(--stone)] mt-2">
-                        {item.product.genre.slice(0, 2).join(', ')}
-                      </p>
-                    </div>
-
-                    {/* Price & Quantity */}
-                    <div className="flex items-end justify-between mt-4">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center border border-[var(--mist)]">
-                          <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                            className="w-10 h-10 flex items-center justify-center text-[var(--stone)] hover:text-[var(--ink)] transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 12H4" />
-                            </svg>
-                          </button>
-                          <span className="w-12 text-center text-sm text-[var(--ink)]">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                            className="w-10 h-10 flex items-center justify-center text-[var(--stone)] hover:text-[var(--ink)] transition-colors"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
-                            </svg>
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => removeFromCart(item.product.id)}
-                          className="text-sm text-[var(--stone)] hover:text-[var(--crimson)] transition-colors"
+                    {/* Details */}
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex-1">
+                        <Link
+                          href={`/product/${product.id}`}
+                          className="text-lg text-[var(--ink)] hover:text-[var(--crimson)] transition-colors"
+                          style={{ fontFamily: 'var(--font-heading)' }}
                         >
-                          Remove
-                        </button>
+                          {product.title}
+                        </Link>
+                        <p className="text-sm text-[var(--stone)] mt-1">
+                          {product.author}
+                        </p>
+                        <p className="text-sm text-[var(--stone)] mt-2">
+                          {(product.genre || []).slice(0, 2).join(', ')}
+                        </p>
                       </div>
 
-                      <span className="text-lg font-medium text-[var(--ink)]">
-                        {formatPrice(item.product.price * item.quantity)}
-                      </span>
+                      {/* Price & Quantity */}
+                      <div className="flex items-end justify-between mt-4">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center border border-[var(--mist)]">
+                            <button
+                              onClick={() => updateQuantity(product.id, item.quantity - 1)}
+                              className="w-10 h-10 flex items-center justify-center text-[var(--stone)] hover:text-[var(--ink)] transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 12H4" />
+                              </svg>
+                            </button>
+                            <span className="w-12 text-center text-sm text-[var(--ink)]">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(product.id, item.quantity + 1)}
+                              className="w-10 h-10 flex items-center justify-center text-[var(--stone)] hover:text-[var(--ink)] transition-colors"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                              </svg>
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => removeFromCart(product.id)}
+                            className="text-sm text-[var(--stone)] hover:text-[var(--crimson)] transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <span className="text-lg font-medium text-[var(--ink)]">
+                          {formatPrice(product.price * item.quantity)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
 
             {/* Order Summary */}

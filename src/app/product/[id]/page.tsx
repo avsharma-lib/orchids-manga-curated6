@@ -12,7 +12,7 @@ import ProductCard from '@/components/ProductCard';
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getProductById, allProducts, getProductInfo, getTShirtsByProductId } = useProducts();
+  const { getProductById, allProducts, getProductInfo, getTShirtsByProductId, loaded } = useProducts();
   const product = getProductById(id);
   const router = useRouter();
   const { addToCart } = useCart();
@@ -31,6 +31,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [singleVolumeNumber, setSingleVolumeNumber] = useState('1');
   const [multipleVolumeCount, setMultipleVolumeCount] = useState('1');
   const [volumeError, setVolumeError] = useState('');
+
+  if (!loaded) {
+    return <div className="pt-32 text-center text-[var(--stone)] min-h-screen">Loading product...</div>;
+  }
 
   if (!product) {
     notFound();
@@ -85,7 +89,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
 
     if (selectionMode === 'single') {
-      if (!validateSingleVolume(singleVolumeNumber)) return;
+      if (!validateSingleStock(singleVolumeNumber)) return;
       const volumeNum = parseInt(singleVolumeNumber);
       const suffix = selectedSize ? `-size-${selectedSize}` : '';
       const sizeTitle = selectedSize ? ` - Size ${selectedSize}` : '';
@@ -120,7 +124,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     const sizeTitle = selectedSize ? ` - Size ${selectedSize}` : '';
 
     if (selectionMode === 'single') {
-      if (!validateSingleVolume(singleVolumeNumber)) return;
+      if (!validateSingleStock(singleVolumeNumber)) return;
       const volumeNum = parseInt(singleVolumeNumber);
       buyItem = {
         product: { ...product, id: `${product.id}-vol-${volumeNum}${suffix}`, title: `${product.title} - Stock ${volumeNum}${sizeTitle}`, price: product.price },
@@ -335,7 +339,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                       value={singleVolumeNumber}
                       onChange={(e) => {
                         setSingleVolumeNumber(e.target.value);
-                        validateSingleVolume(e.target.value);
+                        validateSingleStock(e.target.value);
                       }}
                       className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
                       placeholder="Enter volume number"

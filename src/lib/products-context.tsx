@@ -161,16 +161,26 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
 
       const info: Record<string, ProductInfo> = {};
       for (const row of mangaRows) {
-        if (row.product_info) {
+        let productInfoObj = row.product_info as any;
+        if (typeof row.product_info === 'string') {
+          try {
+            productInfoObj = JSON.parse(row.product_info);
+          } catch (e) {
+            console.error('Failed to parse product_info for row', row.id);
+            productInfoObj = {};
+          }
+        }
+
+        if (productInfoObj) {
           info[row.id] = {
-            productType: row.product_info.productType || 'Apparel',
-            publisher: row.product_info.publisher || '-',
+            productType: productInfoObj.productType || 'Apparel',
+            publisher: productInfoObj.publisher || 'Inkai',
             stock: row.volumes,
-            material: row.product_info.material || 'Cotton',
-            usage: row.product_info.usage || 'Wear',
-            isbn: row.product_info.isbn || '-',
-            weight: row.product_info.weight || '-',
-            dimensions: row.product_info.dimensions || '-',
+            material: productInfoObj.material || 'Cotton',
+            usage: productInfoObj.usage || 'Wear',
+            isbn: productInfoObj.isbn || '-',
+            weight: productInfoObj.weight || '-',
+            dimensions: productInfoObj.dimensions || '-',
             sizes: Array.isArray(productInfoObj.sizes) ? productInfoObj.sizes : [],
             media: Array.isArray(productInfoObj.media) ? productInfoObj.media : [],
           };
@@ -202,7 +212,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     const manga = getProductByIdFn(id);
     return allProductInfo[id] || {
       productType: 'Apparel',
-      publisher: '-',
+      publisher: 'Inkai',
       stock: manga?.stock || 0,
       material: 'Cotton',
       usage: 'Wear',

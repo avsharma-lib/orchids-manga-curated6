@@ -63,7 +63,7 @@ export const getProductInfo = (id: string): ProductInfo => {
   const manga = getProductById(id);
   return clothingProductInfo[id] || {
     productType: 'Apparel',
-    publisher: '-',
+    publisher: 'Inkai',
     stock: manga?.stock || 0,
     material: 'Cotton',
     usage: 'Wear',

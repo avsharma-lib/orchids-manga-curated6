@@ -128,7 +128,7 @@ useEffect(() => {
   const items = isBuyNow
   ? (buyNowItem ? [buyNowItem] : [])
   : cartItems;
-  const totalPrice = isBuyNow && buyNowItem ? buyNowItem.manga.price * buyNowItem.quantity : cartTotal;
+  const totalPrice = isBuyNow && buyNowItem ? buyNowItem.product.price * buyNowItem.quantity : cartTotal;
   const shippingCost = totalPrice >= 2000 ? 0 : 150;
 
   const discountAmount = Math.round((totalPrice * discountPercent) / 100);
@@ -196,7 +196,7 @@ useEffect(() => {
     try {
       const fullAddress = [formData.addressLine1, formData.addressLine2, formData.city, formData.state, formData.pincode].filter(Boolean).join(', ');
       const orderItems = items.map(item => ({
-        mangaId: item.product.id,
+        productId: item.product.id,
         title: item.product.title,
         author: item.product.author || '',
         price: item.product.price,

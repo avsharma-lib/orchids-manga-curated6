@@ -10,13 +10,14 @@ import { useCart } from '@/lib/cart-context';
 
 export default function ActionFigureDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getHoodieById } = useProducts();
+  const { getHoodieById, loaded } = useProducts();
   const hoodie = getHoodieById(id);
   const router = useRouter();
   const { addToCart } = useCart();
   const [imgError, setImgError] = useState(false);
 
-  if (!figure) { notFound(); }
+  if (!loaded) return <div className="pt-32 text-center text-[var(--stone)] min-h-screen">Loading hoodie...</div>;
+  if (!hoodie) { notFound(); }
 
   const handleAddToCart = () => {
     addToCart({ id: hoodie.id, title: hoodie.title, author: hoodie.brand || 'Hoodie', description: hoodie.description, price: hoodie.price, originalPrice: hoodie.originalPrice, image: hoodie.image, genre: ['Hoodie'], rating: 4.5, stock: 1, status: 'completed' });

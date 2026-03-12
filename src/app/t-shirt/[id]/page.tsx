@@ -11,11 +11,15 @@ import { useCart } from '@/lib/cart-context';
 
 export default function BoxSetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getTShirtById, getProductById, allTShirts } = useProducts();
+  const { getTShirtById, getProductById, allTShirts, loaded } = useProducts();
   const tShirt = getTShirtById(id);
   const router = useRouter();
   const { addToCart } = useCart();
   const [imgError, setImgError] = useState(false);
+
+  if (!loaded) {
+    return <div className="pt-32 text-center text-[var(--stone)] min-h-screen">Loading t-shirt...</div>;
+  }
 
   if (!tShirt) {
     notFound();

@@ -358,7 +358,7 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
     id: '', title: '', author: '', description: '', price: '', originalPrice: '',
     image: '', additionalMedia: [] as string[], genre: [] as string[], sizes: [] as string[], rating: '4.5', volumes: '', status: 'completed',
     featured: false, isNew: false, section: 'all',
-    publisher: '', material: 'Cotton', usage: 'Wear', isbn: '', weight: '', dimensions: '',
+    publisher: 'Inkai', material: 'Cotton', usage: 'Wear', isbn: '', weight: '', dimensions: '',
   });
 
   const generateId = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -389,11 +389,11 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
         volumes: parseInt(form.volumes) || 1, status: form.status,
         featured: form.featured || form.section === 'featured',
         is_new: form.isNew || form.section === 'new',
-        product_info: { productType: 'Apparel', sizes: form.sizes, media: form.additionalMedia, publisher: form.publisher || '-', material: form.material, usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' } as any,
+        product_info: { productType: 'Apparel', sizes: form.sizes, media: form.additionalMedia, publisher: form.publisher || 'Inkai', material: form.material || 'Cotton', usage: form.usage, isbn: form.isbn || '-', weight: form.weight || '-', dimensions: form.dimensions || '-' } as any,
       });
       setSuccess(`"${form.title}" added!`);
       await refreshProducts(); await loadCustomProducts();
-      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', additionalMedia: [], genre: [], sizes: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: '', material: 'Cotton', usage: 'Wear', isbn: '', weight: '', dimensions: '' });
+      setForm({ id: '', title: '', author: '', description: '', price: '', originalPrice: '', image: '', additionalMedia: [], genre: [], sizes: [], rating: '4.5', volumes: '', status: 'completed', featured: false, isNew: false, section: 'all', publisher: 'Inkai', material: 'Cotton', usage: 'Wear', isbn: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
   };
 
@@ -461,7 +461,11 @@ function AddMangaTab({ allProducts, refreshProducts, loadCustomProducts }: {
               <button type="button" onClick={() => setForm(prev => ({ ...prev, featured: false, isNew: false }))} className={`px-4 py-2 text-sm border rounded ${!form.featured && !form.isNew ? 'bg-[var(--ink)] text-[var(--paper)]' : 'border-[var(--mist)] text-[var(--stone)]'}`}>Standard (Neither)</button>
             </div>
           </div>
-          <div className="grid md:grid-cols-2 gap-4"><div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Care Instructions</label><input type="text" value={form.publisher} onChange={e => setForm(prev => ({ ...prev, publisher: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div><div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">SKU</label><input type="text" value={form.isbn} onChange={e => setForm(prev => ({ ...prev, isbn: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div></div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Material (e.g. Cotton)</label><input type="text" value={form.material} onChange={e => setForm(prev => ({ ...prev, material: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">Publisher / Brand</label><input type="text" value={form.publisher} onChange={e => setForm(prev => ({ ...prev, publisher: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+            <div><label className="block text-xs tracking-widest uppercase text-[var(--stone)] mb-2">SKU</label><input type="text" value={form.isbn} onChange={e => setForm(prev => ({ ...prev, isbn: e.target.value }))} className="w-full px-4 py-3 border border-[var(--mist)] rounded bg-[var(--paper)] text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none" /></div>
+          </div>
           <button type="submit" disabled={submitting} className="w-full py-4 bg-[var(--ink)] text-[var(--paper)] text-sm tracking-widest uppercase hover:bg-[var(--charcoal)] transition-colors disabled:opacity-50">{submitting ? 'Adding...' : 'Add Product'}</button>
         </form>
       </div>
@@ -478,7 +482,7 @@ function AddBoxSetTab({ allProducts, refreshProducts, loadCustomProducts }: {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ id: '', mangaId: '', title: '', description: '', image: '', price: '', originalPrice: '', volumesIncluded: '', publisher: '', weight: '', dimensions: '' });
+  const [form, setForm] = useState({ id: '', mangaId: '', title: '', description: '', image: '', price: '', originalPrice: '', volumesIncluded: '', publisher: 'Inkai', weight: '', dimensions: '' });
   const generateId = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -490,7 +494,7 @@ function AddBoxSetTab({ allProducts, refreshProducts, loadCustomProducts }: {
       const originalPrice = parseInt(form.originalPrice) || price * 2;
       await addCustomBoxSet({ id: form.id || generateId(form.title), manga_id: form.mangaId || null, title: form.title, description: form.description || '', image: form.image || 'https://via.placeholder.com/400x600', price: price, original_price: originalPrice, volumes_included: form.volumesIncluded || '', publisher: form.publisher || '', weight: form.weight || '', dimensions: form.dimensions || '' });
       setSuccess(`"${form.title}" added!`); await refreshProducts(); await loadCustomProducts();
-      setForm({ id: '', mangaId: '', title: '', description: '', image: '', price: '', originalPrice: '', volumesIncluded: '', publisher: '', weight: '', dimensions: '' });
+      setForm({ id: '', mangaId: '', title: '', description: '', image: '', price: '', originalPrice: '', volumesIncluded: '', publisher: 'Inkai', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
   };
 

@@ -10,12 +10,13 @@ import { useCart } from '@/lib/cart-context';
 
 export default function AccessoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getAccessoryById } = useProducts();
+  const { getAccessoryById, loaded } = useProducts();
   const accessory = getAccessoryById(id);
   const router = useRouter();
   const { addToCart } = useCart();
   const [imgError, setImgError] = useState(false);
 
+  if (!loaded) return <div className="pt-32 text-center text-[var(--stone)] min-h-screen">Loading accessory...</div>;
   if (!accessory) { notFound(); }
 
   const handleAddToCart = () => {

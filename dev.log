@@ -18,3 +18,6 @@ https://nextjs.org/telemetry
  HEAD / 200 in 4118ms
  GET / 200 in 4789ms
  GET /?_cb=1773425820950 200 in 4625ms
+ GET /?_cb=1773425846243 200 in 108ms
+ GET / 200 in 96ms
+ GET /?_cb=1773425879206 200 in 97ms

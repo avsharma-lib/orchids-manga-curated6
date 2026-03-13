@@ -35,7 +35,7 @@ export default function AccessoryDetailPage({ params }: { params: Promise<{ id: 
       <div className="mx-auto max-w-7xl px-6 lg:px-12 py-6">
         <nav className="flex items-center gap-2 text-sm text-[var(--stone)]">
           <Link href="/" className="hover:text-[var(--ink)]">Home</Link><span>/</span>
-          <Link href="/accessorys" className="hover:text-[var(--ink)]">Accessorys</Link><span>/</span>
+          <Link href="/accessories" className="hover:text-[var(--ink)]">Accessories</Link><span>/</span>
           <span className="text-[var(--ink)]">{accessory.title}</span>
         </nav>
       </div>

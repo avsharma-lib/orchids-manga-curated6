@@ -1,3 +1,5 @@
+import { buildProductInfo, normalizeCatalogItemId } from '@/lib/catalog-utils';
+
 export interface Product {
   id: string;
   title: string;
@@ -60,17 +62,9 @@ export const getTShirtById = (id: string): TShirt | undefined => {
 };
 
 export const getProductInfo = (id: string): ProductInfo => {
-  const manga = getProductById(id);
-  return clothingProductInfo[id] || {
-    productType: 'Apparel',
-    publisher: 'Inkai',
-    stock: manga?.stock || 0,
-    material: 'Cotton',
-    usage: 'Wear',
-    isbn: '-',
-    weight: '-',
-    dimensions: '-'
-  };
+  const normalizedId = normalizeCatalogItemId(id);
+  const manga = getProductById(normalizedId);
+  return buildProductInfo(clothingProductInfo[normalizedId], manga?.stock || 0);
 };
 
 // Curated manga collection
@@ -82,7 +76,7 @@ export const genres = [];
 export const getFeaturedProduct = () => productCollection.filter(m => m.featured);
 export const getNewProduct = () => productCollection.filter(m => m.new);
 export const getProductByGenre = (genre: string) => productCollection.filter(m => m.genre.includes(genre));
-export const getProductById = (id: string) => productCollection.find(m => m.id === id);
+export const getProductById = (id: string) => productCollection.find(m => m.id === normalizeCatalogItemId(id));
 
 export const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-IN', {

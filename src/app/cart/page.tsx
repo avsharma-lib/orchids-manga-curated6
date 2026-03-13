@@ -5,9 +5,12 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCart } from '@/lib/cart-context';
 import { formatPrice } from '@/lib/product-data';
+import { useProducts } from '@/lib/products-context';
+import { resolveCatalogPath } from '@/lib/catalog-utils';
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems } = useCart();
+  const { allProducts, allTShirts, allHoodies, allAccessories } = useProducts();
 
   if (items.length === 0) {
     return (
@@ -72,6 +75,7 @@ export default function CartPage() {
             <div className="lg:col-span-2 space-y-8">
               {items.map((item, index) => {
                 const product = item.product || item.manga;
+                const productHref = resolveCatalogPath(product?.id || '', { allProducts, allTShirts, allHoodies, allAccessories });
                 if (!product) return null;
                 return (
                   <motion.div
@@ -82,7 +86,7 @@ export default function CartPage() {
                     className="flex gap-6 pb-8 border-b border-[var(--mist)]"
                   >
                     {/* Image */}
-                    <Link href={`/product/${product.id}`} className="shrink-0">
+                    <Link href={productHref} className="shrink-0">
                       <div className="relative w-24 h-36 md:w-32 md:h-48 bg-[var(--mist)] overflow-hidden">
                         <Image
                           src={product.image}
@@ -98,7 +102,7 @@ export default function CartPage() {
                     <div className="flex-1 flex flex-col">
                       <div className="flex-1">
                         <Link
-                          href={`/product/${product.id}`}
+                          href={productHref}
                           className="text-lg text-[var(--ink)] hover:text-[var(--crimson)] transition-colors"
                           style={{ fontFamily: 'var(--font-heading)' }}
                         >

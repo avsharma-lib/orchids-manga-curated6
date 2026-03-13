@@ -6,6 +6,7 @@ import {
   productCollection, tShirtsData, clothingProductInfo, genres as staticGenres,
   formatPrice
 } from '@/lib/product-data';
+import { buildProductInfo, normalizeCatalogItemId, normalizeMaterial, normalizePublisher } from '@/lib/catalog-utils';
 import {
   getCustomManga as getCustomProduct, getCustomBoxSets as getCustomTShirts, getCustomActionFigures as getCustomHoodies, getCustomKatanas as getCustomAccessorys,
   CustomMangaRow, CustomBoxSetRow, CustomActionFigureRow, CustomKatanaRow
@@ -92,7 +93,7 @@ function convertCustomTShirt(row: CustomBoxSetRow): TShirt {
     price: row.price,
     originalPrice: row.original_price,
     sizesAvailable: row.volumes_included,
-    publisher: row.publisher,
+    publisher: normalizePublisher(row.publisher),
     weight: row.weight,
     dimensions: row.dimensions,
   };
@@ -109,7 +110,7 @@ function convertCustomHoodie(row: CustomActionFigureRow): Hoodie {
     brand: row.brand,
     characterName: row.character_name,
     series: row.series,
-    material: row.material,
+    material: normalizeMaterial(row.material),
     height: row.height,
     weight: row.weight,
     dimensions: row.dimensions,
@@ -172,18 +173,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
         }
 
         if (productInfoObj) {
-          info[row.id] = {
-            productType: productInfoObj.productType || 'Apparel',
-            publisher: productInfoObj.publisher || 'Inkai',
-            stock: row.volumes,
-            material: productInfoObj.material || 'Cotton',
-            usage: productInfoObj.usage || 'Wear',
-            isbn: productInfoObj.isbn || '-',
-            weight: productInfoObj.weight || '-',
-            dimensions: productInfoObj.dimensions || '-',
-            sizes: Array.isArray(productInfoObj.sizes) ? productInfoObj.sizes : [],
-            media: Array.isArray(productInfoObj.media) ? productInfoObj.media : [],
-          };
+          info[row.id] = buildProductInfo(productInfoObj, row.volumes);
         }
       }
       setCustomProductInfo(info);
@@ -205,27 +195,19 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     new Set([...staticGenres, ...customProduct.flatMap(m => m.genre)])
   ).sort();
 
-  const getProductByIdFn = (id: string) => allProducts.find(m => m.id === id);
-  const getTShirtByIdFn = (id: string) => allTShirts.find(b => b.id === id);
-  const getTShirtsByProductIdFn = (productId: string) => allTShirts.filter(b => b.productId === productId);
+  const getProductByIdFn = (id: string) => allProducts.find(m => m.id === normalizeCatalogItemId(id));
+  const getTShirtByIdFn = (id: string) => allTShirts.find(b => b.id === normalizeCatalogItemId(id));
+  const getTShirtsByProductIdFn = (productId: string) => allTShirts.filter(b => b.productId === normalizeCatalogItemId(productId));
   const getProductInfoFn = (id: string): ProductInfo => {
-    const manga = getProductByIdFn(id);
-    return allProductInfo[id] || {
-      productType: 'Apparel',
-      publisher: 'Inkai',
-      stock: manga?.stock || 0,
-      material: 'Cotton',
-      usage: 'Wear',
-      isbn: '-',
-      weight: '-',
-      dimensions: '-',
-    };
+    const normalizedId = normalizeCatalogItemId(id);
+    const manga = getProductByIdFn(normalizedId);
+    return buildProductInfo(allProductInfo[normalizedId], manga?.stock || 0);
   };
   const getFeaturedProductFn = () => allProducts.filter(m => m.featured);
   const getNewProductFn = () => allProducts.filter(m => m.new);
   const getProductByGenreFn = (genre: string) => allProducts.filter(m => m.genre.includes(genre));
-  const getHoodieByIdFn = (id: string) => hoodies.find(f => f.id === id);
-  const getAccessoryByIdFn = (id: string) => accessories.find(k => k.id === id);
+  const getHoodieByIdFn = (id: string) => hoodies.find(f => f.id === normalizeCatalogItemId(id));
+  const getAccessoryByIdFn = (id: string) => accessories.find(k => k.id === normalizeCatalogItemId(id));
 
   return (
     <ProductsContext.Provider

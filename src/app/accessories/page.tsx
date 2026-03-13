@@ -13,13 +13,13 @@ export default function AccessoriesPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
           <nav className="flex items-center gap-2 text-sm text-[var(--stone)] mb-6"><Link href="/" className="hover:text-[var(--ink)]">Home</Link><span>/</span><span className="text-[var(--ink)]">Accessories</span></nav>
           <h1 className="text-4xl md:text-5xl text-[var(--ink)]" style={{ fontFamily: 'var(--font-heading)' }}>Accessories</h1>
-          <p className="mt-4 text-[var(--stone)]">{allAccessories.length} accessorys available</p>
+          <p className="mt-4 text-[var(--stone)]">{allAccessories.length} accessories available</p>
         </div>
       </section>
       <section className="py-12">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
           {allAccessories.length === 0 ? (
-            <div className="text-center py-24"><p className="text-[var(--stone)] text-lg">No accessorys yet. Check back soon!</p></div>
+            <div className="text-center py-24"><p className="text-[var(--stone)] text-lg">No accessories yet. Check back soon!</p></div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
               {allAccessories.map((accessory, index) => (

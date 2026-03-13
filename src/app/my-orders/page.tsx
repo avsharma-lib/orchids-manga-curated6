@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getOrdersByDeviceId, getDeviceId, Order } from '@/lib/supabase';
 import { formatPrice } from '@/lib/product-data';
+import { useProducts } from '@/lib/products-context';
+import { resolveCatalogPath } from '@/lib/catalog-utils';
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered'];
 
@@ -68,6 +70,7 @@ export default function MyOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const { allProducts, allTShirts, allHoodies, allAccessories } = useProducts();
 
   useEffect(() => {
     loadOrders();
@@ -235,22 +238,45 @@ export default function MyOrdersPage() {
                           Ordered Items
                         </h4>
                         <div className="space-y-4 mb-6">
-                          {(order.items as { image: string; title: string; author: string; quantity: number; price: number }[])?.map((item, idx: number) => (
+                          {(order.items as { productId?: string; mangaId?: string; image: string; title: string; author: string; quantity: number; price: number }[])?.map((item, idx: number) => {
+                            const productHref = resolveCatalogPath(item.productId || item.mangaId || '', { allProducts, allTShirts, allHoodies, allAccessories });
+                            const hasProductLink = Boolean(item.productId || item.mangaId);
+
+                            return (
                             <div key={idx} className="flex gap-4">
-                              <div className="relative w-16 h-24 bg-[var(--mist)] overflow-hidden rounded shrink-0">
-                                <Image
-                                  src={item.image}
-                                  alt={item.title}
-                                  fill
-                                  className="object-cover"
-                                  sizes="64px"
-                                  unoptimized
-                                />
-                              </div>
+                              {hasProductLink ? (
+                                <Link href={productHref} className="relative w-16 h-24 bg-[var(--mist)] overflow-hidden rounded shrink-0 block">
+                                  <Image
+                                    src={item.image}
+                                    alt={item.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes="64px"
+                                    unoptimized
+                                  />
+                                </Link>
+                              ) : (
+                                <div className="relative w-16 h-24 bg-[var(--mist)] overflow-hidden rounded shrink-0">
+                                  <Image
+                                    src={item.image}
+                                    alt={item.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes="64px"
+                                    unoptimized
+                                  />
+                                </div>
+                              )}
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-[var(--ink)] truncate">
-                                  {item.title}
-                                </p>
+                                {hasProductLink ? (
+                                  <Link href={productHref} className="text-sm font-medium text-[var(--ink)] truncate block hover:text-[var(--crimson)] transition-colors">
+                                    {item.title}
+                                  </Link>
+                                ) : (
+                                  <p className="text-sm font-medium text-[var(--ink)] truncate">
+                                    {item.title}
+                                  </p>
+                                )}
                                 <p className="text-xs text-[var(--stone)]">
                                   {item.author}
                                 </p>
@@ -264,7 +290,8 @@ export default function MyOrdersPage() {
                                 </div>
                               </div>
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
 
                         {/* Order Summary */}

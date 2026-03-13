@@ -20,7 +20,8 @@ export function getDeviceId(): string {
 }
 
 export interface OrderItem {
-  mangaId: string;
+  productId?: string;
+  mangaId?: string;
   title: string;
   author: string;
   price: number;
@@ -457,7 +458,7 @@ CREATE TABLE IF NOT EXISTS custom_manga (
   status TEXT DEFAULT 'completed',
   featured BOOLEAN DEFAULT false,
   is_new BOOLEAN DEFAULT false,
-  product_info JSONB DEFAULT '{}',
+  product_info JSONB DEFAULT '{"publisher":"Inkai","material":"Cotton"}',
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -471,7 +472,7 @@ CREATE TABLE IF NOT EXISTS custom_boxsets (
   price INTEGER NOT NULL,
   original_price INTEGER NOT NULL,
   volumes_included TEXT DEFAULT '',
-  publisher TEXT DEFAULT '',
+  publisher TEXT DEFAULT 'Inkai',
   weight TEXT DEFAULT '',
   dimensions TEXT DEFAULT '',
   created_at TIMESTAMPTZ DEFAULT now()
@@ -488,7 +489,7 @@ CREATE TABLE IF NOT EXISTS custom_action_figures (
   brand TEXT DEFAULT '',
   character_name TEXT DEFAULT '',
   series TEXT DEFAULT '',
-  material TEXT DEFAULT 'PVC',
+  material TEXT DEFAULT 'Cotton',
   height TEXT DEFAULT '',
   weight TEXT DEFAULT '',
   dimensions TEXT DEFAULT '',

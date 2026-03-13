@@ -4,21 +4,24 @@ import { notFound, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { use, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { formatPrice } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
 import { useCart } from '@/lib/cart-context';
 import ProductCard from '@/components/ProductCard';
+import { normalizeCatalogItemId, resolveCatalogPath } from '@/lib/catalog-utils';
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { getProductById, allProducts, getProductInfo, getTShirtsByProductId, loaded } = useProducts();
-  const product = getProductById(id);
+  const normalizedId = normalizeCatalogItemId(id);
+  const { getProductById, allProducts, allTShirts, allHoodies, allAccessories, getProductInfo, getTShirtsByProductId, loaded } = useProducts();
+  const product = getProductById(normalizedId);
   const router = useRouter();
   const { addToCart } = useCart();
   const [imgError, setImgError] = useState(false);
-  const productInfo = getProductInfo(id);
-  const tShirts = getTShirtsByProductId(id);
+  const productInfo = getProductInfo(normalizedId);
+  const tShirts = getTShirtsByProductId(normalizedId);
+  const resolvedPath = resolveCatalogPath(normalizedId, { allProducts, allTShirts, allHoodies, allAccessories });
 
   const allMedia = [product?.image, ...(productInfo?.media || [])].filter(Boolean);
   const [activeMedia, setActiveMedia] = useState<string>(product?.image || '');
@@ -32,11 +35,20 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [multipleVolumeCount, setMultipleVolumeCount] = useState('1');
   const [volumeError, setVolumeError] = useState('');
 
+  useEffect(() => {
+    if (loaded && !product && resolvedPath !== `/product/${normalizedId}`) {
+      router.replace(resolvedPath);
+    }
+  }, [loaded, normalizedId, product, resolvedPath, router]);
+
   if (!loaded) {
     return <div className="pt-32 text-center text-[var(--stone)] min-h-screen">Loading product...</div>;
   }
 
   if (!product) {
+    if (resolvedPath !== `/product/${normalizedId}`) {
+      return <div className="pt-32 text-center text-[var(--stone)] min-h-screen">Opening product...</div>;
+    }
     notFound();
   }
 

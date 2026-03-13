@@ -35,7 +35,7 @@ export default function ActionFigureDetailPage({ params }: { params: Promise<{ i
       <div className="mx-auto max-w-7xl px-6 lg:px-12 py-6">
         <nav className="flex items-center gap-2 text-sm text-[var(--stone)]">
           <Link href="/" className="hover:text-[var(--ink)]">Home</Link><span>/</span>
-          <Link href="/action-figures" className="hover:text-[var(--ink)]">Hoodies</Link><span>/</span>
+          <Link href="/hoodies" className="hover:text-[var(--ink)]">Hoodies</Link><span>/</span>
           <span className="text-[var(--ink)]">{hoodie.title}</span>
         </nav>
       </div>

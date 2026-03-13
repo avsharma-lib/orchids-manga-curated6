@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { getAllOrders, updateOrderStatus, Order, addCustomManga, addCustomBoxSet, addCustomActionFigure, addCustomKatana, deleteCustomManga, deleteCustomBoxSet, deleteCustomActionFigure, deleteCustomKatana, CustomMangaRow, CustomBoxSetRow, CustomActionFigureRow, CustomKatanaRow, getCustomManga, getCustomBoxSets, getCustomActionFigures, getCustomKatanas, initCustomProductTables, INIT_SQL, uploadProductImage, CustomCouponRow, getCoupons, createCoupon, deleteCoupon } from '@/lib/supabase';
 import { formatPrice, genres as staticGenres } from '@/lib/product-data';
 import { useProducts } from '@/lib/products-context';
+import { resolveCatalogPath } from '@/lib/catalog-utils';
 
 const ADMIN_CODES = ['ADMIN'];
 
@@ -85,7 +87,7 @@ export default function AdminPage() {
   const [isBrandized, setIsBrandized] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<AdminTab>('orders');
-  const { allProducts, allTShirts, refreshProducts } = useProducts();
+  const { allProducts, allTShirts, allHoodies, allAccessories, refreshProducts } = useProducts();
 
   const [customMangaList, setCustomMangaList] = useState<CustomMangaRow[]>([]);
   const [customBoxSetList, setCustomBoxSetList] = useState<CustomBoxSetRow[]>([]);
@@ -305,13 +307,27 @@ function OrdersTab({ orders, expandedOrder, setExpandedOrder, handleStatusChange
                         <div>
                           <h4 className="text-xs tracking-widest uppercase text-[var(--stone)] mb-4">Ordered Items</h4>
                           <div className="space-y-4">
-                            {(order.items as any[])?.map((item: any, idx: number) => (
+                            {(order.items as any[])?.map((item: any, idx: number) => {
+                              const productHref = resolveCatalogPath(item.productId || item.mangaId || '', { allProducts, allTShirts, allHoodies, allAccessories });
+                              const hasProductLink = Boolean(item.productId || item.mangaId);
+
+                              return (
                               <div key={idx} className="flex gap-4">
-                                <div className="relative w-12 h-18 bg-[var(--mist)] overflow-hidden shrink-0">
-                                  <Image src={item.image} alt={item.title} fill className="object-cover" sizes="48px" unoptimized />
-                                </div>
+                                {hasProductLink ? (
+                                  <Link href={productHref} className="relative w-12 h-18 bg-[var(--mist)] overflow-hidden shrink-0 block">
+                                    <Image src={item.image} alt={item.title} fill className="object-cover" sizes="48px" unoptimized />
+                                  </Link>
+                                ) : (
+                                  <div className="relative w-12 h-18 bg-[var(--mist)] overflow-hidden shrink-0">
+                                    <Image src={item.image} alt={item.title} fill className="object-cover" sizes="48px" unoptimized />
+                                  </div>
+                                )}
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-[var(--ink)] truncate">{item.title}</p>
+                                  {hasProductLink ? (
+                                    <Link href={productHref} className="text-sm font-medium text-[var(--ink)] truncate block hover:text-[var(--crimson)] transition-colors">{item.title}</Link>
+                                  ) : (
+                                    <p className="text-sm font-medium text-[var(--ink)] truncate">{item.title}</p>
+                                  )}
                                   <p className="text-xs text-[var(--stone)]">{item.author}</p>
                                   <div className="flex justify-between mt-1">
                                     <span className="text-xs text-[var(--stone)]">Qty: {item.quantity} × {formatPrice(item.price)}</span>
@@ -319,7 +335,8 @@ function OrdersTab({ orders, expandedOrder, setExpandedOrder, handleStatusChange
                                   </div>
                                 </div>
                               </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                         <div>
@@ -492,7 +509,7 @@ function AddBoxSetTab({ allProducts, refreshProducts, loadCustomProducts }: {
     try {
       const price = parseInt(form.price) || 0;
       const originalPrice = parseInt(form.originalPrice) || price * 2;
-      await addCustomBoxSet({ id: form.id || generateId(form.title), manga_id: form.mangaId || null, title: form.title, description: form.description || '', image: form.image || 'https://via.placeholder.com/400x600', price: price, original_price: originalPrice, volumes_included: form.volumesIncluded || '', publisher: form.publisher || '', weight: form.weight || '', dimensions: form.dimensions || '' });
+      await addCustomBoxSet({ id: form.id || generateId(form.title), manga_id: form.mangaId || null, title: form.title, description: form.description || '', image: form.image || 'https://via.placeholder.com/400x600', price: price, original_price: originalPrice, volumes_included: form.volumesIncluded || '', publisher: form.publisher || 'Inkai', weight: form.weight || '', dimensions: form.dimensions || '' });
       setSuccess(`"${form.title}" added!`); await refreshProducts(); await loadCustomProducts();
       setForm({ id: '', mangaId: '', title: '', description: '', image: '', price: '', originalPrice: '', volumesIncluded: '', publisher: 'Inkai', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
@@ -541,7 +558,7 @@ function AddActionFigureTab({ refreshProducts, loadCustomProducts }: { refreshPr
     try {
       const price = parseInt(form.price) || 0;
       const originalPrice = parseInt(form.originalPrice) || price * 2;
-      await addCustomActionFigure({ id: generateId(form.title), title: form.title, description: form.description || '', price: price, original_price: originalPrice, image: form.image || 'https://via.placeholder.com/400x600', brand: form.brand || '', character_name: form.characterName || '', series: form.series || '', material: form.material || '', height: form.height || '', weight: form.weight || '', dimensions: form.dimensions || '' });
+      await addCustomActionFigure({ id: generateId(form.title), title: form.title, description: form.description || '', price: price, original_price: originalPrice, image: form.image || 'https://via.placeholder.com/400x600', brand: form.brand || '', character_name: form.characterName || '', series: form.series || '', material: form.material || 'Cotton', height: form.height || '', weight: form.weight || '', dimensions: form.dimensions || '' });
       setSuccess(`"${form.title}" added!`); await refreshProducts(); await loadCustomProducts();
       setForm({ title: '', description: '', price: '', originalPrice: '', image: '', brand: '', characterName: '', series: '', material: 'Cotton', height: '', weight: '', dimensions: '' });
     } catch (err: any) { setError(err.message || 'Failed'); } finally { setSubmitting(false); }
